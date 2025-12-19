@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.text.Text?>
+<?import javafx.scene.shape.Circle?>
+
+<VBox spacing="0" styleClass="main-container" 
+      stylesheets="@../style/style.css"
+      xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.izo.netpulse.ui.NetPulseController"
+      maxWidth="-Infinity" maxHeight="-Infinity" 
+      minWidth="-Infinity" minHeight="-Infinity">
+
+    <HBox alignment="CENTER_RIGHT" styleClass="title-bar"
+          onMousePressed="#handleMousePressed" onMouseDragged="#handleMouseDragged" onMouseReleased="#handleMouseReleased">
+        <Text text="NetPulse Monitor" styleClass="header-text" />
+        <Region HBox.hgrow="ALWAYS" />
+        <Button text="—" onAction="#handleMinimise" styleClass="window-button"/>
+        <Button text="▢" onAction="#handleMaximize" styleClass="window-button"/>
+        <Button text="✕" onAction="#handleClose" styleClass="window-button-close"/> 
+    </HBox>
+
+    
+
+    <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <Tab text="LIVE TEST">
+            <VBox alignment="CENTER" spacing="30" style="-fx-padding: 40;">
+                <StackPane prefHeight="300">
+                    <Circle radius="120" stroke="#1e1e1e" strokeWidth="15" fill="transparent"/>
+                    
+                    <Circle fx:id="progressCircle" radius="120" stroke="#1DB954" strokeWidth="15" 
+                            fill="transparent" strokeDashArray="754" strokeDashOffset="754"
+                            rotate="-90"/> <VBox alignment="CENTER">
+                        <Label fx:id="speedValueLabel" text="0.0" style="-fx-font-size: 64px; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                        <Label text="Mbps Download" styleClass="status-label"/>
+                    </VBox>
+                </StackPane>
+                
+                <Button text="RUN PULSE TEST" onAction="#handleStartTest" styleClass="pulse-button"/>
+            </VBox>
+        </Tab>
+
+        <Tab text="HISTORY">
+            <VBox spacing="10" style="-fx-padding: 20;">
+                <LineChart fx:id="speedChart" styleClass="chart" VBox.vgrow="ALWAYS" animated="false">
+                    <xAxis><CategoryAxis side="BOTTOM" label="Time" /></xAxis>
+                    <yAxis><NumberAxis side="LEFT" label="Mbps" /></yAxis>
+                </LineChart>
+            </VBox>
+        </Tab>
+    </TabPane>
+</VBox>

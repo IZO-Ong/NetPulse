@@ -1,0 +1,77 @@
+.main-container {
+    -fx-background-color: #121212;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #1e1e1e;
+}
+
+.tab {
+    -fx-background-color: transparent;
+    -fx-padding: 10 30;
+}
+
+.tab:selected {
+    -fx-background-color: transparent;
+    -fx-border-color: #1DB954;
+    -fx-border-width: 0 0 3 0;
+}
+
+.tab .tab-label {
+    -fx-text-fill: #b3b3b3;
+    -fx-font-weight: bold;
+}
+
+.tab:selected .tab-label {
+    -fx-text-fill: white;
+}
+
+.window-button, .window-button-close {
+    -fx-background-color: transparent;
+    -fx-text-fill: #b3b3b3;
+    -fx-min-width: 45px;
+    -fx-min-height: 32px;
+    -fx-cursor: hand;
+}
+
+.window-button:hover { 
+    -fx-background-color: #333333; 
+    -fx-text-fill: white; 
+}
+
+.window-button-close:hover {
+     -fx-background-color: #e81123;
+     -fx-text-fill: white; 
+}
+
+.status-label {
+    -fx-text-fill: #A7A7A7;
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+    -fx-letter-spacing: 0.5px;
+    -fx-padding: 10 0;
+    -fx-opacity: 0.8;
+}
+
+.status-label:disabled {
+    -fx-opacity: 0.5;
+}
+
+.pulse-button {
+    -fx-background-color: #1DB954;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 12 50;
+    -fx-background-radius: 50;
+    -fx-cursor: hand;
+}
+
+.pulse-button:hover { 
+    -fx-background-color: #1ed760;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
+.chart-plot-background { -fx-background-color: #000000; }
+.chart-series-line { -fx-stroke: #1DB954; -fx-stroke-width: 3px; }
+.axis { -fx-tick-label-fill: #888888; }
