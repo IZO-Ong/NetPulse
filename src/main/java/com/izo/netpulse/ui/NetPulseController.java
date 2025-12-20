@@ -55,10 +55,7 @@ public class NetPulseController {
             speedChart.getData().add(series);
         }
 
-        currentSweep.addListener((obs, oldVal, newVal) -> {
-            updateNeedlePosition(newVal.doubleValue());
-        });
-
+        currentSweep.addListener((obs, oldVal, newVal) -> updateNeedlePosition(newVal.doubleValue()));
         updateNeedlePosition(0);
     }
 
@@ -153,9 +150,7 @@ public class NetPulseController {
                     series.getData().add(new XYChart.Data<>(time, averageMbps));
                     statusLabel.setText("Result: " + String.format("%.2f", averageMbps) + " Mbps");
 
-                    Timeline resetDelay = new Timeline(new KeyFrame(Duration.seconds(0.2), e -> {
-                        resetGauge();
-                    }));
+                    Timeline resetDelay = new Timeline(new KeyFrame(Duration.seconds(0.2), e -> resetGauge()));
                     resetDelay.play();
                 });
             }
