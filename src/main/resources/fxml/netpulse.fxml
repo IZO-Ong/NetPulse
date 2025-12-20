@@ -5,7 +5,9 @@
 <?import javafx.scene.chart.*?>
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.Arc?>
 <?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.Group?>
 
 <VBox styleClass="main-container"
       stylesheets="@../style/style.css"
@@ -28,9 +30,9 @@
             </graphic>
         </Button>
 
-        <Button onAction="#handleMaximize" styleClass="window-button">
+        <Button fx:id="maximizeButton" onAction="#handleMaximize" styleClass="window-button">
             <graphic>
-                <SVGPath content="M1,1 H9 V9 H1 V1 Z M2,2 V8 H8 V2 H2 Z" fill="white" />
+                <SVGPath fx:id="maximizeIcon" content="M1,1 H9 V9 H1 V1 Z M2,2 V8 H8 V2 H2 Z" fill="white" />
             </graphic>
         </Button>
 
@@ -42,24 +44,35 @@
     </HBox>
 
     <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
-        <Tab text="LIVE TEST">
+        <Tab text="SPEED TEST">
             <VBox alignment="CENTER" spacing="30" style="-fx-padding: 40;">
-                <StackPane prefHeight="300">
-                    <Circle radius="120" stroke="#1e1e1e" strokeWidth="15" fill="transparent"/>
+                <StackPane prefHeight="400">
+                    <Group StackPane.alignment="CENTER">
+                        <Arc centerX="0" centerY="0" radiusX="120" radiusY="120"
+                             startAngle="60" length="-300" type="OPEN"
+                             stroke="#1e1e1e" strokeWidth="15" fill="transparent" strokeLineCap="ROUND"/>
 
-                    <Circle fx:id="progressCircle" radius="120" stroke="#1DB954" strokeWidth="15"
-                            fill="transparent"
-                            strokeDashArray="754" strokeDashOffset="754"
-                            strokeLineCap="ROUND" rotate="-90"/>
+                        <Arc fx:id="progressArc" centerX="0" centerY="0" radiusX="120" radiusY="120"
+                             startAngle="60" length="0" type="OPEN"
+                             stroke="#1DB954" strokeWidth="15" fill="transparent" strokeLineCap="ROUND"/>
 
-                    <VBox alignment="CENTER">
-                        <Label fx:id="speedValueLabel" text="0.0"
-                               style="-fx-font-size: 64px; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                        <Circle fx:id="needleCircle" radius="6" fill="white" stroke="#1DB954" strokeWidth="2" />
 
-                        <Label fx:id="statusLabel" text="System Ready" styleClass="status-label"/>
-                    </VBox>
+                        <Group mouseTransparent="true">
+                            <Label text="0" translateX="75" translateY="-120" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                            <Label text="60" translateX="125" translateY="35" style="-fx-text-fill: #888888;"/>
+                            <Label text="125" translateX="-10" translateY="135" style="-fx-text-fill: #888888;"/>
+                            <Label text="190" translateX="-145" translateY="35" style="-fx-text-fill: #888888;"/>
+                            <Label text="250+" translateX="-105" translateY="-120" style="-fx-text-fill: #888888;"/>
+                        </Group>
+
+                        <VBox alignment="CENTER" translateX="-100" translateY="-60" prefWidth="200" mouseTransparent="true">
+                            <Label fx:id="speedValueLabel" text="0.0"
+                                   style="-fx-font-size: 64px; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                            <Label fx:id="statusLabel" text="Mbps Download" styleClass="status-label"/>
+                        </VBox>
+                    </Group>
                 </StackPane>
-
                 <Button text="RUN PULSE TEST" onAction="#handleStartTest" styleClass="pulse-button"/>
             </VBox>
         </Tab>
