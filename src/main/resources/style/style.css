@@ -1,12 +1,12 @@
-/* --- THEME CONSTANTS --- */
+/* THEME CONSTANTS */
 .root {
-    -fx-base: #121212;             /* Global dark base for unstyled components */
-    -fx-accent: #1DB954;           /* Spotify/Steam Green */
+    -fx-base: #121212;
+    -fx-accent: #1DB954;
 
-    /* Custom Palette */
+    /* Palette */
     -color-bg-main: #121212;
     -color-bg-header: #1e1e1e;
-    -color-bg-surface: #0c0c0c;    /* Deeper black for charts/inner sections */
+    -color-bg-surface: #0c0c0c;
     -color-green-primary: #1DB954;
     -color-green-hover: #1ed760;
     -color-text-main: white;
@@ -15,14 +15,14 @@
     -color-border: #333333;
 }
 
-/* --- LAYOUT CONTAINERS --- */
+/* LAYOUT CONTAINERS */
 .main-container {
     -fx-background-color: -color-bg-main;
 }
 
 .title-bar {
     -fx-background-color: -color-bg-main;
-    -fx-padding: 0 0 0 15; /* Breather for the title text */
+    -fx-padding: 0 0 0 15;
 }
 
 .header-text {
@@ -31,7 +31,6 @@
     -fx-font-size: 14px;
 }
 
-/* --- TABS (STEAM STYLE) --- */
 .tab-pane {
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
@@ -61,13 +60,12 @@
     -fx-text-fill: -color-text-main;
 }
 
-/* Kill blue focus box shown in image_ad6eca */
 .tab-pane .tab:focused .focus-indicator {
     -fx-border-color: transparent !important;
     -fx-border-width: 0 !important;
 }
 
-/* --- WINDOW CONTROLS --- */
+/* WINDOW CONTROLS*/
 .window-button, .window-button-close {
     -fx-background-color: transparent;
     -fx-min-width: 45px;
@@ -94,12 +92,18 @@
     -fx-fill: white;
 }
 
-/* --- BUTTONS & LABELS --- */
+/* BUTTONS & LABELS */
 .status-label {
     -fx-text-fill: #A7A7A7;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
     -fx-opacity: 0.8;
+}
+
+.speed-value-label {
+    -fx-font-size: 64px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
 }
 
 .pulse-button {
@@ -117,7 +121,6 @@
     -fx-scale-y: 1.05;
 }
 
-/* --- CHART (STEAM STYLE VISUALIZATION) --- */
 .chart {
     -fx-padding: 20 15 5 15;
 }
@@ -126,24 +129,21 @@
     -fx-background-color: -color-bg-surface;
 }
 
-/* Kill Grid Lines for cleaner look */
 .chart-vertical-grid-lines,
 .chart-horizontal-grid-lines {
     -fx-stroke: transparent;
 }
 
-/* Line & Legend Color Logic (Ensures Green instead of Orange) */
 .default-color0.chart-series-line {
     -fx-stroke: -color-green-primary;
     -fx-stroke-width: 2.5px;
 }
 
-.default-color0.chart-line-symbol { /* The dot in the legend */
+.default-color0.chart-line-symbol {
     -fx-background-color: -color-green-primary, white;
-    -fx-background-radius: 0; /* Square legend symbol */
+    -fx-background-radius: 0;
 }
 
-/* AXIS STYLING */
 .axis {
     -fx-border-color: -color-border transparent transparent transparent;
 }
