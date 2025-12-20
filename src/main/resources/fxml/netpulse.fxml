@@ -7,7 +7,6 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.shape.Arc?>
 <?import javafx.scene.shape.SVGPath?>
-<?import javafx.scene.Group?>
 
 <VBox styleClass="main-container"
       stylesheets="@../style/style.css"
@@ -48,36 +47,34 @@
             <VBox alignment="CENTER" spacing="30" style="-fx-padding: 40;">
                 <StackPane prefHeight="400" prefWidth="400">
                     <Pane maxWidth="400" maxHeight="400" StackPane.alignment="CENTER">
-                        <children>
-                            <Arc centerX="200" centerY="200" radiusX="120" radiusY="120"
-                                 startAngle="60" length="-300"
-                                 stroke="#1e1e1e" strokeWidth="15" fill="transparent" strokeLineCap="ROUND"/>
+                        <Arc centerX="200" centerY="200" radiusX="120" radiusY="120"
+                             startAngle="60" length="-300"
+                             stroke="#1e1e1e" strokeWidth="15" fill="transparent" strokeLineCap="ROUND"/>
 
-                            <Arc fx:id="progressArc" centerX="200" centerY="200" radiusX="120" radiusY="120"
-                                 startAngle="60"
-                                 stroke="#1DB954" strokeWidth="15" fill="transparent" strokeLineCap="ROUND"/>
+                        <Arc fx:id="progressArc" centerX="200" centerY="200" radiusX="120" radiusY="120"
+                             startAngle="60"
+                             stroke="#1DB954" strokeWidth="15" fill="transparent" strokeLineCap="ROUND"/>
 
-                            <Circle fx:id="needleCircle" centerX="200" centerY="200" radius="6"
-                                    fill="white" stroke="#1DB954" strokeWidth="2" />
+                        <Circle fx:id="needleCircle" centerX="200" centerY="200" radius="6"
+                                fill="white" stroke="#1DB954" strokeWidth="2" />
 
-                            <Label text="0" layoutX="275" layoutY="80"
-                                   style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                            <Label text="60" layoutX="330" layoutY="230"
-                                   style="-fx-text-fill: #888888;"/>
-                            <Label text="125" layoutX="185" layoutY="335"
-                                   style="-fx-text-fill: #888888;"/>
-                            <Label text="190" layoutX="50" layoutY="230"
-                                   style="-fx-text-fill: #888888;"/>
-                            <Label text="250+" layoutX="95" layoutY="80"
-                                   style="-fx-text-fill: #888888;"/>
+                        <Label text="0" layoutX="275" layoutY="80"
+                               style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+                        <Label text="60" layoutX="330" layoutY="230"
+                               style="-fx-text-fill: #888888;"/>
+                        <Label text="125" layoutX="185" layoutY="335"
+                               style="-fx-text-fill: #888888;"/>
+                        <Label text="190" layoutX="50" layoutY="230"
+                               style="-fx-text-fill: #888888;"/>
+                        <Label text="250+" layoutX="95" layoutY="80"
+                               style="-fx-text-fill: #888888;"/>
 
-                            <VBox alignment="CENTER" layoutX="100" layoutY="140" prefWidth="200"
-                                  mouseTransparent="true" spacing="0">
-                                <Label fx:id="speedValueLabel" text="0.0" alignment="CENTER" prefWidth="200"
-                                       styleClass="speed-value-label"/>
-                                <Label fx:id="statusLabel" text="Mbps Download" styleClass="status-label" alignment="CENTER" prefWidth="200"/>
-                            </VBox>
-                        </children>
+                        <VBox alignment="CENTER" layoutX="100" layoutY="140" prefWidth="200"
+                              mouseTransparent="true">
+                            <Label fx:id="speedValueLabel" text="0.0" alignment="CENTER" prefWidth="200"
+                                   styleClass="speed-value-label"/>
+                            <Label fx:id="statusLabel" text="Mbps Download" styleClass="status-label" alignment="CENTER" prefWidth="200"/>
+                        </VBox>
                     </Pane>
                 </StackPane>
                 <Button text="RUN PULSE TEST" onAction="#handleStartTest" styleClass="pulse-button"/>
