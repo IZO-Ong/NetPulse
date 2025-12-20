@@ -1,68 +1,109 @@
+/* --- THEME CONSTANTS --- */
+.root {
+    -fx-base: #121212;             /* Global dark base for unstyled components */
+    -fx-accent: #1DB954;           /* Spotify/Steam Green */
+
+    /* Custom Palette */
+    -color-bg-main: #121212;
+    -color-bg-header: #1e1e1e;
+    -color-bg-surface: #0c0c0c;    /* Deeper black for charts/inner sections */
+    -color-green-primary: #1DB954;
+    -color-green-hover: #1ed760;
+    -color-text-main: white;
+    -color-text-muted: #b3b3b3;
+    -color-text-dim: #888888;
+    -color-border: #333333;
+}
+
+/* --- LAYOUT CONTAINERS --- */
 .main-container {
-    -fx-background-color: #121212;
+    -fx-background-color: -color-bg-main;
+}
+
+.title-bar {
+    -fx-background-color: -color-bg-main;
+    -fx-padding: 0 0 0 15; /* Breather for the title text */
 }
 
 .header-text {
-    -fx-fill: white;
+    -fx-fill: -color-text-main;
     -fx-font-weight: bold;
     -fx-font-size: 14px;
 }
 
+/* --- TABS (STEAM STYLE) --- */
+.tab-pane {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
 .tab-pane .tab-header-area .tab-header-background {
-    -fx-background-color: #1e1e1e;
+    -fx-background-color: -color-bg-header;
 }
 
 .tab {
     -fx-background-color: transparent;
     -fx-padding: 10 30;
+    -fx-cursor: hand;
 }
 
 .tab:selected {
-    -fx-background-color: transparent;
+    -fx-border-color: -color-green-primary;
+    -fx-border-width: 0 0 3 0; /* Bottom indicator */
 }
 
 .tab .tab-label {
-    -fx-text-fill: #b3b3b3;
+    -fx-text-fill: -color-text-muted;
     -fx-font-weight: bold;
 }
 
 .tab:selected .tab-label {
-    -fx-text-fill: white;
+    -fx-text-fill: -color-text-main;
 }
 
+/* Kill blue focus box shown in image_ad6eca */
+.tab-pane .tab:focused .focus-indicator {
+    -fx-border-color: transparent !important;
+    -fx-border-width: 0 !important;
+}
+
+/* --- WINDOW CONTROLS --- */
 .window-button, .window-button-close {
     -fx-background-color: transparent;
-    -fx-text-fill: #b3b3b3;
     -fx-min-width: 45px;
     -fx-min-height: 32px;
-    -fx-cursor: hand;
 }
 
-.window-button:hover { 
-    -fx-background-color: #333333; 
-    -fx-text-fill: white; 
+.window-button SVGPath, .window-button-close SVGPath {
+    -fx-fill: -color-text-muted; /* Vector icons color */
+}
+
+.window-button:hover {
+    -fx-background-color: -color-border;
+}
+
+.window-button:hover SVGPath {
+    -fx-fill: -color-text-main;
 }
 
 .window-button-close:hover {
-     -fx-background-color: #e81123;
-     -fx-text-fill: white; 
+    -fx-background-color: #e81123;
 }
 
+.window-button-close:hover SVGPath {
+    -fx-fill: white;
+}
+
+/* --- BUTTONS & LABELS --- */
 .status-label {
     -fx-text-fill: #A7A7A7;
     -fx-font-size: 13px;
     -fx-font-weight: bold;
-    -fx-letter-spacing: 0.5px;
-    -fx-padding: 10 0;
     -fx-opacity: 0.8;
 }
 
-.status-label:disabled {
-    -fx-opacity: 0.5;
-}
-
 .pulse-button {
-    -fx-background-color: #1DB954;
+    -fx-background-color: -color-green-primary;
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-padding: 12 50;
@@ -71,11 +112,58 @@
 }
 
 .pulse-button:hover {
-    -fx-background-color: #1ed760;
+    -fx-background-color: -color-green-hover;
     -fx-scale-x: 1.05;
     -fx-scale-y: 1.05;
 }
 
-.chart-plot-background { -fx-background-color: #000000; }
-.chart-series-line { -fx-stroke: #1DB954; -fx-stroke-width: 3px; }
-.axis { -fx-tick-label-fill: #888888; }
+/* --- CHART (STEAM STYLE VISUALIZATION) --- */
+.chart {
+    -fx-padding: 20 15 5 15;
+}
+
+.chart-plot-background {
+    -fx-background-color: -color-bg-surface;
+}
+
+/* Kill Grid Lines for cleaner look */
+.chart-vertical-grid-lines,
+.chart-horizontal-grid-lines {
+    -fx-stroke: transparent;
+}
+
+/* Line & Legend Color Logic (Ensures Green instead of Orange) */
+.default-color0.chart-series-line {
+    -fx-stroke: -color-green-primary;
+    -fx-stroke-width: 2.5px;
+}
+
+.default-color0.chart-line-symbol { /* The dot in the legend */
+    -fx-background-color: -color-green-primary, white;
+    -fx-background-radius: 0; /* Square legend symbol */
+}
+
+/* AXIS STYLING */
+.axis {
+    -fx-border-color: -color-border transparent transparent transparent;
+}
+
+.axis .tick-mark-label {
+    -fx-fill: white !important;
+    -fx-font-size: 11px;
+}
+
+.axis .axis-label {
+    -fx-text-fill: -color-text-muted !important;
+    -fx-font-size: 11px;
+}
+
+.chart-legend {
+   -fx-background-color: transparent;
+   -fx-padding: 0 0 20 0;
+}
+
+.chart-legend-item {
+    -fx-text-fill: -color-text-main;
+    -fx-font-weight: bold;
+}

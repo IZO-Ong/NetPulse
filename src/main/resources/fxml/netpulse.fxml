@@ -5,8 +5,9 @@
 <?import javafx.scene.chart.*?>
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.SVGPath?>
 
-<VBox spacing="0" styleClass="main-container"
+<VBox styleClass="main-container"
       stylesheets="@../style/style.css"
       xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.izo.netpulse.ui.NetPulseController"
@@ -14,12 +15,30 @@
       minWidth="-Infinity" minHeight="-Infinity">
 
     <HBox alignment="CENTER_RIGHT" styleClass="title-bar"
-          onMousePressed="#handleMousePressed" onMouseDragged="#handleMouseDragged" onMouseReleased="#handleMouseReleased">
+          style="-fx-padding: 0 0 0 5;"
+          onMousePressed="#handleMousePressed"
+          onMouseDragged="#handleMouseDragged">
+
         <Text text="NetPulse Monitor" styleClass="header-text" />
         <Region HBox.hgrow="ALWAYS" />
-        <Button text="—" onAction="#handleMinimise" styleClass="window-button"/>
-        <Button text="▢" onAction="#handleMaximize" styleClass="window-button"/>
-        <Button text="✕" onAction="#handleClose" styleClass="window-button-close"/>
+
+        <Button onAction="#handleMinimise" styleClass="window-button">
+            <graphic>
+                <SVGPath content="M0,5 H10" stroke="white" strokeWidth="1.5" />
+            </graphic>
+        </Button>
+
+        <Button onAction="#handleMaximize" styleClass="window-button">
+            <graphic>
+                <SVGPath content="M1,1 H9 V9 H1 V1 Z M2,2 V8 H8 V2 H2 Z" fill="white" />
+            </graphic>
+        </Button>
+
+        <Button onAction="#handleClose" styleClass="window-button-close">
+            <graphic>
+                <SVGPath content="M1,1 L9,9 M9,1 L1,9" stroke="white" strokeWidth="1.5" />
+            </graphic>
+        </Button>
     </HBox>
 
     <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
@@ -37,7 +56,7 @@
                         <Label fx:id="speedValueLabel" text="0.0"
                                style="-fx-font-size: 64px; -fx-text-fill: white; -fx-font-weight: bold;"/>
 
-                        <Label fx:id="statusLabel" text="Mbps Download" styleClass="status-label"/>
+                        <Label fx:id="statusLabel" text="System Ready" styleClass="status-label"/>
                     </VBox>
                 </StackPane>
 
@@ -47,9 +66,22 @@
 
         <Tab text="HISTORY">
             <VBox spacing="10" style="-fx-padding: 20;">
-                <LineChart fx:id="speedChart" styleClass="chart" VBox.vgrow="ALWAYS" animated="false">
-                    <xAxis><CategoryAxis side="BOTTOM" label="Time" /></xAxis>
-                    <yAxis><NumberAxis side="LEFT" label="Mbps" /></yAxis>
+                <LineChart fx:id="speedChart"
+                           styleClass="chart"
+                           VBox.vgrow="ALWAYS"
+                           animated="false"
+                           legendSide="TOP"
+                           createSymbols="false">
+                    <xAxis>
+                        <CategoryAxis side="BOTTOM" label="Time"
+                                      tickMarkVisible="false"
+                                      gapStartAndEnd="false" /> </xAxis>
+
+                    <yAxis>
+                        <NumberAxis side="LEFT" label="Speed (Mbps)"
+                                    tickMarkVisible="false"
+                                    minorTickVisible="false" /> </yAxis>
+
                 </LineChart>
             </VBox>
         </Tab>
