@@ -12,24 +12,48 @@ public class BackgroundMonitor {
 
     private final SpeedTestService speedTestService;
 
-    // Runs every 15 minutes (900,000 ms)
+    // Runs every 15 minutes (900000 ms)
     @Scheduled(fixedRate = 900000)
     public void autoPulse() {
         log.info("Starting scheduled background speed pulse...");
 
-        // Use the new 7-second sampling test
-        speedTestService.runPulseTest(new SpeedTestService.PulseCallback() {
+        // Phase 1: Download
+        speedTestService.runDownloadTest(new SpeedTestService.PulseCallback() {
             @Override
             public void onInstantUpdate(double mbps) {
-                // Background task: No UI to update, so we do nothing here
+                // No UI updates needed for background task
             }
 
             @Override
-            public void onComplete(double averageMbps) {
-                // The service already handles saving to the DB in runPulseTest,
-                // so we just log the completion here.
-                log.info("Scheduled pulse complete. Average Download: {} Mbps",
-                        String.format("%.2f", averageMbps));
+            public void onComplete(double avgDownload) {
+                log.info("Background Download Phase Complete: {} Mbps. Starting Upload...",
+                        String.format("%.2f", avgDownload));
+
+                // Phase 2: Upload (chained sequentially)
+                speedTestService.runUploadTest(new SpeedTestService.PulseCallback() {
+                    @Override
+                    public void onInstantUpdate(double mbps) {}
+
+                    @Override
+                    public void onComplete(double avgUpload) {
+                        // Persist the combined results to the database
+                        speedTestService.saveResult(avgDownload, avgUpload);
+
+                        log.info("Scheduled pulse complete. DL: {} Mbps | UL: {} Mbps",
+                                String.format("%.2f", avgDownload),
+                                String.format("%.2f", avgUpload));
+                    }
+
+                    @Override
+                    public void onError(String errorMessage) {
+                        log.error("Background Upload Pulse failed: {}", errorMessage);
+                    }
+                });
+            }
+
+            @Override
+            public void onError(String errorMessage) {
+                log.error("Background Download Pulse failed: {}", errorMessage);
             }
         });
     }

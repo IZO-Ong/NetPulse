@@ -7,6 +7,8 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.shape.Arc?>
 <?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.effect.Glow?>
 
 <VBox styleClass="main-container"
       stylesheets="@../style/style.css"
@@ -52,11 +54,19 @@
                              stroke="#1e1e1e" strokeWidth="15" fill="transparent" strokeLineCap="ROUND"/>
 
                         <Arc fx:id="progressArc" centerX="200" centerY="200" radiusX="120" radiusY="120"
-                             startAngle="60"
-                             stroke="#1DB954" strokeWidth="15" fill="transparent" strokeLineCap="ROUND"/>
+                             startAngle="60" stroke="#1DB954" strokeWidth="15"
+                             fill="transparent" strokeLineCap="ROUND">
+                            <effect>
+                                <DropShadow color="#1DB954" radius="15" spread="0.05" />
+                            </effect>
+                        </Arc>
 
                         <Circle fx:id="needleCircle" centerX="200" centerY="200" radius="6"
-                                fill="white" stroke="#1DB954" strokeWidth="2" />
+                                fill="white" stroke="#1DB954" strokeWidth="2">
+                            <effect>
+                                <Glow level="0.8" />
+                            </effect>
+                        </Circle>
 
                         <Label text="0" layoutX="275" layoutY="80"
                                style="-fx-text-fill: white; -fx-font-weight: bold;"/>
@@ -73,32 +83,48 @@
                               mouseTransparent="true">
                             <Label fx:id="speedValueLabel" text="0.0" alignment="CENTER" prefWidth="200"
                                    styleClass="speed-value-label"/>
-                            <Label fx:id="statusLabel" text="Mbps Download" styleClass="status-label" alignment="CENTER" prefWidth="200"/>
+                            <Label fx:id="statusLabel" text="Ready for Testing!" styleClass="status-label" alignment="CENTER" prefWidth="200"/>
                         </VBox>
                     </Pane>
                 </StackPane>
-                <Button text="RUN PULSE TEST" onAction="#handleStartTest" styleClass="pulse-button"/>
+
+                <VBox alignment="CENTER" spacing="5" minHeight="60">
+                    <Label fx:id="speedFeedbackLabel"
+                           styleClass="feedback-label"
+                           wrapText="true"
+                           textAlignment="CENTER"
+                           maxWidth="350"/>
+                </VBox>
+
+                <Button fx:id="actionButton"
+                        text="RUN TEST"
+                        onAction="#handleActionButtonClick"
+                        onMouseEntered="#handleHoverStart"
+                        onMouseExited="#handleHoverEnd"
+                        styleClass="pulse-button"/>
             </VBox>
         </Tab>
 
         <Tab text="HISTORY">
-            <VBox spacing="10" style="-fx-padding: 20;">
-                <LineChart fx:id="speedChart"
-                           styleClass="chart"
-                           VBox.vgrow="ALWAYS"
+            <VBox spacing="10" style="-fx-padding: 20;" VBox.vgrow="ALWAYS">
+                <LineChart fx:id="historyLineChart"
                            animated="false"
                            legendSide="TOP"
-                           createSymbols="false">
+                           VBox.vgrow="ALWAYS"
+                           styleClass="history-line-chart">
                     <xAxis>
-                        <CategoryAxis side="BOTTOM" label="Time"
-                                      tickMarkVisible="false"
-                                      gapStartAndEnd="false" /> </xAxis>
-
+                        <NumberAxis fx:id="historyXAxis"
+                                    side="BOTTOM"
+                                    tickLabelFill="white"
+                                    label="Time (Local)"
+                                    forceZeroInRange="false"
+                                    tickLabelGap="10"/> </xAxis>
                     <yAxis>
-                        <NumberAxis side="LEFT" label="Speed (Mbps)"
-                                    tickMarkVisible="false"
-                                    minorTickVisible="false" /> </yAxis>
-
+                        <NumberAxis fx:id="historyYAxis"
+                                    side="LEFT"
+                                    label="Speed (Mbps)"
+                                    tickLabelFill="white"/>
+                    </yAxis>
                 </LineChart>
             </VBox>
         </Tab>

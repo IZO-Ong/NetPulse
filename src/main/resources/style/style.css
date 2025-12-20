@@ -13,6 +13,7 @@
     -color-text-muted: #b3b3b3;
     -color-text-dim: #888888;
     -color-border: #333333;
+    -color-error: #ff4444;
 }
 
 /* LAYOUT CONTAINERS */
@@ -31,6 +32,7 @@
     -fx-font-size: 14px;
 }
 
+/* TABS */
 .tab-pane {
     -fx-focus-color: transparent;
     -fx-faint-focus-color: transparent;
@@ -48,7 +50,7 @@
 
 .tab:selected {
     -fx-border-color: -color-green-primary;
-    -fx-border-width: 0 0 3 0; /* Bottom indicator */
+    -fx-border-width: 0 0 3 0;
 }
 
 .tab .tab-label {
@@ -65,7 +67,7 @@
     -fx-border-width: 0 !important;
 }
 
-/* WINDOW CONTROLS*/
+/* WINDOW CONTROLS */
 .window-button, .window-button-close {
     -fx-background-color: transparent;
     -fx-min-width: 45px;
@@ -73,7 +75,7 @@
 }
 
 .window-button SVGPath, .window-button-close SVGPath {
-    -fx-fill: -color-text-muted; /* Vector icons color */
+    -fx-fill: -color-text-muted;
 }
 
 .window-button:hover {
@@ -92,7 +94,7 @@
     -fx-fill: white;
 }
 
-/* BUTTONS & LABELS */
+/* GAUGE & LABELS */
 .status-label {
     -fx-text-fill: #A7A7A7;
     -fx-font-size: 13px;
@@ -106,64 +108,60 @@
     -fx-font-weight: bold;
 }
 
+/* BUTTONS */
 .pulse-button {
-    -fx-background-color: -color-green-primary;
+    -fx-background-color: #2a2a2a;
     -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-padding: 12 50;
+    -fx-padding: 12 0;
     -fx-background-radius: 50;
     -fx-cursor: hand;
+    -fx-min-width: 220px;
+    -fx-alignment: CENTER;
+    -fx-content-display: TEXT_ONLY;
 }
 
 .pulse-button:hover {
-    -fx-background-color: -color-green-hover;
+    -fx-background-color: #3a3a3a;
     -fx-scale-x: 1.05;
     -fx-scale-y: 1.05;
 }
 
-.chart {
-    -fx-padding: 20 15 5 15;
+.button-cancel:hover {
+    -fx-background-color: -color-error !important;
 }
 
-.chart-plot-background {
-    -fx-background-color: -color-bg-surface;
-}
-
-.chart-vertical-grid-lines,
-.chart-horizontal-grid-lines {
-    -fx-stroke: transparent;
-}
-
-.default-color0.chart-series-line {
-    -fx-stroke: -color-green-primary;
+/* CHART */
+.history-line-chart .chart-series-line {
     -fx-stroke-width: 2.5px;
 }
 
-.default-color0.chart-line-symbol {
-    -fx-background-color: -color-green-primary, white;
-    -fx-background-radius: 0;
+.history-line-chart .default-color0.chart-series-line {
+    -fx-stroke: #1DB954;
+}
+
+.history-line-chart .default-color0.chart-line-symbol {
+    -fx-background-color: #1DB954, white;
+}
+
+.history-line-chart .default-color1.chart-series-line {
+    -fx-stroke: #67c1f5;
+}
+
+.history-line-chart .default-color1.chart-line-symbol {
+    -fx-background-color: #67c1f5, white;
+}
+
+.axis:bottom .axis-tick-mark {
+    -fx-stroke: #333333;
 }
 
 .axis {
-    -fx-border-color: -color-border transparent transparent transparent;
+    -fx-tick-label-font-size: 10px;
+    -fx-tick-label-fill: -color-text-muted;
 }
 
-.axis .tick-mark-label {
-    -fx-fill: white !important;
-    -fx-font-size: 11px;
-}
-
-.axis .axis-label {
-    -fx-text-fill: -color-text-muted !important;
-    -fx-font-size: 11px;
-}
-
-.chart-legend {
-   -fx-background-color: transparent;
-   -fx-padding: 0 0 20 0;
-}
-
-.chart-legend-item {
+.axis-label {
     -fx-text-fill: -color-text-main;
     -fx-font-weight: bold;
 }
