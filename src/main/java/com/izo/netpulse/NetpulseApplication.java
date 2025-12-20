@@ -1,5 +1,6 @@
 package com.izo.netpulse;
 
+import javafx.application.Application;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -7,7 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class NetpulseApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(NetpulseApplication.class, args);
+        Application.launch(JavaFxApp.class, args);
 	}
 
 }

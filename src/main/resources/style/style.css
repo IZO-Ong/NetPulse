@@ -2,6 +2,12 @@
     -fx-background-color: #121212;
 }
 
+.header-text {
+    -fx-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+}
+
 .tab-pane .tab-header-area .tab-header-background {
     -fx-background-color: #1e1e1e;
 }
@@ -13,8 +19,6 @@
 
 .tab:selected {
     -fx-background-color: transparent;
-    -fx-border-color: #1DB954;
-    -fx-border-width: 0 0 3 0;
 }
 
 .tab .tab-label {
@@ -66,7 +70,7 @@
     -fx-cursor: hand;
 }
 
-.pulse-button:hover { 
+.pulse-button:hover {
     -fx-background-color: #1ed760;
     -fx-scale-x: 1.05;
     -fx-scale-y: 1.05;

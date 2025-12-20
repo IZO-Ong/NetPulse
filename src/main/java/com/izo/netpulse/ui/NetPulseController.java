@@ -13,14 +13,14 @@ import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Label;
-import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Component
 @RequiredArgsConstructor
@@ -38,6 +38,8 @@ public class NetPulseController {
     private Stage stage;
     private boolean isMaximized = false;
     private double prevX, prevY, prevWidth, prevHeight;
+    private static final double MAX_SPEED = 200.0;
+    private static final double CIRCUMFERENCE = 754.0; // 2 * PI * radius(120)
 
     @FXML
     public void initialize() {
@@ -147,22 +149,29 @@ public class NetPulseController {
 
     @FXML
     public void handleStartTest() {
-        statusLabel.setText("Pulse initiated...");
-        new Thread(() -> {
-            try {
-                var result = speedService.runTest();
-                Platform.runLater(() -> {
-                    animateSpeedResult(result.getDownloadMbps());
-                    
-                    series.getData().add(new XYChart.Data<>(
-                        result.getTimestamp().toLocalTime().toString().substring(0, 8), 
-                        result.getDownloadMbps()
-                    ));
-                    statusLabel.setText("Last Result: " + String.format("%.2f", result.getDownloadMbps()) + " Mbps");
-                });
-            } catch (Exception e) {
-                Platform.runLater(() -> statusLabel.setText("Error: Connection Failed"));
+        statusLabel.setText("Pulsing... (7s test)");
+
+        speedService.runPulseTest(new SpeedTestService.PulseCallback() {
+            @Override
+            public void onInstantUpdate(double instantMbps) {
+                speedValueLabel.setText(String.format("%.1f", instantMbps));
+
+                double ratio = Math.min(instantMbps / MAX_SPEED, 1.0);
+                double targetOffset = CIRCUMFERENCE * (1.0 - ratio);
+
+                Timeline t = new Timeline(new KeyFrame(Duration.millis(200),
+                        new KeyValue(progressCircle.strokeDashOffsetProperty(), targetOffset)
+                ));
+                t.play();
             }
-        }).start();
+
+            @Override
+            public void onComplete(double averageMbps) {
+                String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+                series.getData().add(new XYChart.Data<>(time, averageMbps));
+
+                statusLabel.setText("Result: " + String.format("%.2f", averageMbps) + " Mbps");
+            }
+        });
     }
 }
