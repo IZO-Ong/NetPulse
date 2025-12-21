@@ -31,3 +31,8 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### H2 Database files ###
+*.mv.db
+*.trace.db
+netpulse_db*

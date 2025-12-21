@@ -43,10 +43,12 @@
     </HBox>
 
     <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+
         <Tab text="SPEED TEST">
             <VBox styleClass="speed-test-container" spacing="30" VBox.vgrow="ALWAYS">
                 <StackPane VBox.vgrow="ALWAYS">
                     <Pane styleClass="gauge-pane" maxWidth="-Infinity" maxHeight="-Infinity" StackPane.alignment="CENTER">
+
                         <Arc centerX="200" centerY="200" radiusX="120" radiusY="120"
                              startAngle="60" length="-300" styleClass="gauge-arc-bg"/>
 

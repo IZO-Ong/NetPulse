@@ -119,7 +119,7 @@
     -fx-fill: white;
     -fx-stroke: -color-green-primary;
     -fx-stroke-width: 2;
-    -fx-effect: glow(0.8);
+    -fx-effect: dropshadow(three-pass-box, -color-green-primary, 10, 0.7, 0, 0);
 }
 
 .progress-upload {
@@ -127,7 +127,7 @@
     -fx-stroke-width: 15;
     -fx-fill: transparent;
     -fx-stroke-line-cap: round;
-    -fx-effect: dropshadow(three-pass-box, -color-blue-primary, 15, 0.05, 0, 0);
+    -fx-effect: dropshadow(three-pass-box, -color-blue-primary, 10, 0.7, 0, 0);
 }
 
 .progress-upload-needle {

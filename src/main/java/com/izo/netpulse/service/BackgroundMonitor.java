@@ -17,11 +17,9 @@ public class BackgroundMonitor {
     public void autoPulse() {
         log.info("Starting scheduled background speed pulse...");
 
-        // Phase 1: Download
         speedTestService.runDownloadTest(new SpeedTestService.PulseCallback() {
             @Override
             public void onInstantUpdate(double mbps) {
-                // No UI updates needed for background task
             }
 
             @Override
@@ -29,14 +27,12 @@ public class BackgroundMonitor {
                 log.info("Background Download Phase Complete: {} Mbps. Starting Upload...",
                         String.format("%.2f", avgDownload));
 
-                // Phase 2: Upload (chained sequentially)
                 speedTestService.runUploadTest(new SpeedTestService.PulseCallback() {
                     @Override
                     public void onInstantUpdate(double mbps) {}
 
                     @Override
                     public void onComplete(double avgUpload) {
-                        // Persist the combined results to the database
                         speedTestService.saveResult(avgDownload, avgUpload);
 
                         log.info("Scheduled pulse complete. DL: {} Mbps | UL: {} Mbps",
