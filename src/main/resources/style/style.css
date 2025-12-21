@@ -74,27 +74,67 @@
     -fx-min-height: 32px;
 }
 
-.window-button SVGPath, .window-button-close SVGPath {
-    -fx-fill: -color-text-muted;
+.window-icon {
+    -fx-stroke: white;
 }
 
 .window-button:hover {
     -fx-background-color: -color-border;
 }
 
-.window-button:hover SVGPath {
-    -fx-fill: -color-text-main;
-}
-
 .window-button-close:hover {
     -fx-background-color: #e81123;
 }
 
-.window-button-close:hover SVGPath {
-    -fx-fill: white;
+/* GAUGE & SPEED TEST */
+.speed-test-container {
+    -fx-padding: 40;
+    -fx-alignment: CENTER;
 }
 
-/* GAUGE & LABELS */
+.gauge-pane {
+    -fx-pref-width: 400;
+    -fx-pref-height: 400;
+    -fx-max-width: 400;
+    -fx-max-height: 400;
+}
+
+.gauge-arc-bg {
+    -fx-stroke: #1e1e1e;
+    -fx-stroke-width: 15;
+    -fx-fill: transparent;
+    -fx-stroke-line-cap: round;
+}
+
+.gauge-arc-progress {
+    -fx-stroke: -color-green-primary;
+    -fx-stroke-width: 15;
+    -fx-fill: transparent;
+    -fx-stroke-line-cap: round;
+    -fx-effect: dropshadow(three-pass-box, -color-green-primary, 15, 0.05, 0, 0);
+}
+
+.gauge-needle {
+    -fx-fill: white;
+    -fx-stroke: -color-green-primary;
+    -fx-stroke-width: 2;
+    -fx-effect: glow(0.8);
+}
+
+.gauge-marker {
+    -fx-text-fill: -color-text-dim;
+}
+
+.gauge-marker-primary {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.speed-display-box {
+    -fx-alignment: CENTER;
+    -fx-pref-width: 200;
+}
+
 .status-label {
     -fx-text-fill: #A7A7A7;
     -fx-font-size: 13px;
@@ -108,6 +148,16 @@
     -fx-font-weight: bold;
 }
 
+.feedback-container {
+    -fx-alignment: CENTER;
+    -fx-min-height: 60;
+}
+
+.feedback-label {
+    -fx-max-width: 350;
+    -fx-text-alignment: CENTER;
+}
+
 /* BUTTONS */
 .pulse-button {
     -fx-background-color: #2a2a2a;
@@ -118,7 +168,6 @@
     -fx-cursor: hand;
     -fx-min-width: 220px;
     -fx-alignment: CENTER;
-    -fx-content-display: TEXT_ONLY;
 }
 
 .pulse-button:hover {
@@ -132,6 +181,10 @@
 }
 
 /* CHART */
+.history-container {
+    -fx-padding: 20;
+}
+
 .history-line-chart .chart-series-line {
     -fx-stroke-width: 2.5px;
 }
@@ -152,13 +205,13 @@
     -fx-background-color: #67c1f5, white;
 }
 
-.axis:bottom .axis-tick-mark {
-    -fx-stroke: #333333;
-}
-
 .axis {
     -fx-tick-label-font-size: 10px;
     -fx-tick-label-fill: -color-text-muted;
+}
+
+.axis:bottom .axis-tick-mark {
+    -fx-stroke: #333333;
 }
 
 .axis-label {

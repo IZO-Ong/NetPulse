@@ -7,8 +7,6 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.shape.Arc?>
 <?import javafx.scene.shape.SVGPath?>
-<?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.effect.Glow?>
 
 <VBox styleClass="main-container"
       stylesheets="@../style/style.css"
@@ -18,7 +16,6 @@
       minWidth="-Infinity" minHeight="-Infinity">
 
     <HBox alignment="CENTER_RIGHT" styleClass="title-bar"
-          style="-fx-padding: 0 0 0 5;"
           onMousePressed="#handleMousePressed"
           onMouseDragged="#handleMouseDragged">
 
@@ -27,73 +24,52 @@
 
         <Button onAction="#handleMinimise" styleClass="window-button">
             <graphic>
-                <SVGPath content="M0,5 H10" stroke="white" strokeWidth="1.5" />
+                <SVGPath content="M0,5 H10" styleClass="window-icon" />
             </graphic>
         </Button>
 
         <Button onAction="#handleMaximize" styleClass="window-button">
             <graphic>
-                <SVGPath fx:id="maximizeIcon" content="M1,1 H9 V9 H1 V1 Z M2,2 V8 H8 V2 H2 Z" fill="white" />
+                <SVGPath fx:id="maximizeIcon" content="M1,1 H9 V9 H1 V1 Z M2,2 V8 H8 V2 H2 Z" styleClass="window-icon" />
             </graphic>
         </Button>
 
         <Button onAction="#handleClose" styleClass="window-button-close">
             <graphic>
-                <SVGPath content="M1,1 L9,9 M9,1 L1,9" stroke="white" strokeWidth="1.5" />
+                <SVGPath content="M1,1 L9,9 M9,1 L1,9" styleClass="window-icon" />
             </graphic>
         </Button>
     </HBox>
 
     <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <Tab text="SPEED TEST">
-            <VBox alignment="CENTER" spacing="30" style="-fx-padding: 40;">
-                <StackPane prefHeight="400" prefWidth="400">
-                    <Pane maxWidth="400" maxHeight="400" StackPane.alignment="CENTER">
+            <VBox styleClass="speed-test-container" spacing="30" VBox.vgrow="ALWAYS">
+                <StackPane alignment="CENTER" VBox.vgrow="ALWAYS">
+                    <Pane styleClass="gauge-pane" maxWidth="-Infinity" maxHeight="-Infinity" StackPane.alignment="CENTER">
                         <Arc centerX="200" centerY="200" radiusX="120" radiusY="120"
-                             startAngle="60" length="-300"
-                             stroke="#1e1e1e" strokeWidth="15" fill="transparent" strokeLineCap="ROUND"/>
+                             startAngle="60" length="-300" styleClass="gauge-arc-bg"/>
 
                         <Arc fx:id="progressArc" centerX="200" centerY="200" radiusX="120" radiusY="120"
-                             startAngle="60" stroke="#1DB954" strokeWidth="15"
-                             fill="transparent" strokeLineCap="ROUND">
-                            <effect>
-                                <DropShadow color="#1DB954" radius="15" spread="0.05" />
-                            </effect>
-                        </Arc>
+                             startAngle="60" styleClass="gauge-arc-progress" />
 
                         <Circle fx:id="needleCircle" centerX="200" centerY="200" radius="6"
-                                fill="white" stroke="#1DB954" strokeWidth="2">
-                            <effect>
-                                <Glow level="0.8" />
-                            </effect>
-                        </Circle>
+                                styleClass="gauge-needle" />
 
-                        <Label text="0" layoutX="275" layoutY="80"
-                               style="-fx-text-fill: white; -fx-font-weight: bold;"/>
-                        <Label text="60" layoutX="330" layoutY="230"
-                               style="-fx-text-fill: #888888;"/>
-                        <Label text="125" layoutX="185" layoutY="335"
-                               style="-fx-text-fill: #888888;"/>
-                        <Label text="190" layoutX="50" layoutY="230"
-                               style="-fx-text-fill: #888888;"/>
-                        <Label text="250+" layoutX="95" layoutY="80"
-                               style="-fx-text-fill: #888888;"/>
+                        <Label text="0" layoutX="275" layoutY="80" styleClass="gauge-marker-primary"/>
+                        <Label text="60" layoutX="330" layoutY="230" styleClass="gauge-marker"/>
+                        <Label text="125" layoutX="185" layoutY="335" styleClass="gauge-marker"/>
+                        <Label text="190" layoutX="50" layoutY="230" styleClass="gauge-marker"/>
+                        <Label text="250+" layoutX="95" layoutY="80" styleClass="gauge-marker"/>
 
-                        <VBox alignment="CENTER" layoutX="100" layoutY="140" prefWidth="200"
-                              mouseTransparent="true">
-                            <Label fx:id="speedValueLabel" text="0.0" alignment="CENTER" prefWidth="200"
-                                   styleClass="speed-value-label"/>
-                            <Label fx:id="statusLabel" text="Ready for Testing!" styleClass="status-label" alignment="CENTER" prefWidth="200"/>
+                        <VBox layoutX="100" layoutY="140" styleClass="speed-display-box" mouseTransparent="true">
+                            <Label fx:id="speedValueLabel" text="0.0" styleClass="speed-value-label"/>
+                            <Label fx:id="statusLabel" text="Ready for Testing!" styleClass="status-label"/>
                         </VBox>
                     </Pane>
                 </StackPane>
 
-                <VBox alignment="CENTER" spacing="5" minHeight="60">
-                    <Label fx:id="speedFeedbackLabel"
-                           styleClass="feedback-label"
-                           wrapText="true"
-                           textAlignment="CENTER"
-                           maxWidth="350"/>
+                <VBox styleClass="feedback-container" spacing="5">
+                    <Label fx:id="speedFeedbackLabel" styleClass="feedback-label" wrapText="true"/>
                 </VBox>
 
                 <Button fx:id="actionButton"
@@ -106,24 +82,17 @@
         </Tab>
 
         <Tab text="HISTORY">
-            <VBox spacing="10" style="-fx-padding: 20;" VBox.vgrow="ALWAYS">
+            <VBox styleClass="history-container" spacing="10" VBox.vgrow="ALWAYS">
                 <LineChart fx:id="historyLineChart"
                            animated="false"
                            legendSide="TOP"
                            VBox.vgrow="ALWAYS"
                            styleClass="history-line-chart">
                     <xAxis>
-                        <NumberAxis fx:id="historyXAxis"
-                                    side="BOTTOM"
-                                    tickLabelFill="white"
-                                    label="Time (Local)"
-                                    forceZeroInRange="false"
-                                    tickLabelGap="10"/> </xAxis>
+                        <NumberAxis fx:id="historyXAxis" side="BOTTOM" label="Time" forceZeroInRange="false" />
+                    </xAxis>
                     <yAxis>
-                        <NumberAxis fx:id="historyYAxis"
-                                    side="LEFT"
-                                    label="Speed (Mbps)"
-                                    tickLabelFill="white"/>
+                        <NumberAxis side="LEFT" label="Speed (Mbps)" />
                     </yAxis>
                 </LineChart>
             </VBox>

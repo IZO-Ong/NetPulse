@@ -45,7 +45,8 @@ public class SpeedTestService {
             long testStartTime = System.currentTimeMillis();
             List<Double> speedSamples = new ArrayList<>();
             try (Response response = activeOkCall.execute()) {
-                if (!response.isSuccessful()) throw new IOException("HTTP " + response.code());
+                if (!response.isSuccessful())
+                    throw new IOException("HTTP " + response.code());
 
                 InputStream is = response.body().byteStream();
                 byte[] buffer = new byte[32768];
