@@ -65,7 +65,6 @@ public class NetPulseController {
 
     @FXML
     public void initialize() {
-        // initialize GaugeManager
         gaugeManager = new GaugeManager(progressArc, needleCircle, speedValueLabel);
         refreshHistory();
     }

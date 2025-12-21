@@ -58,7 +58,7 @@
                         <Circle fx:id="needleCircle" centerX="200" centerY="200" radius="6"
                                 styleClass="progress-download-needle" />
 
-                        <Group fx:id="downloadMarkers">
+                        <Group fx:id="downloadMarkers" managed="false" mouseTransparent="true">
                             <Label text="0" layoutX="275" layoutY="80" styleClass="gauge-marker-primary"/>
                             <Label text="60" layoutX="330" layoutY="230" styleClass="gauge-marker"/>
                             <Label text="125" layoutX="190" layoutY="335" styleClass="gauge-marker"/>
@@ -66,7 +66,7 @@
                             <Label text="250+" layoutX="95" layoutY="80" styleClass="gauge-marker"/>
                         </Group>
 
-                        <Group fx:id="uploadMarkers" opacity="0.0" scaleX="0.5" scaleY="0.5">
+                        <Group fx:id="uploadMarkers" managed="false" mouseTransparent="true" opacity="0.0" scaleX="0.5" scaleY="0.5">
                             <Label text="0" layoutX="275" layoutY="80" styleClass="gauge-marker-primary"/>
                             <Label text="25" layoutX="330" layoutY="230" styleClass="gauge-marker"/>
                             <Label text="50" layoutX="190" layoutY="335" styleClass="gauge-marker"/>

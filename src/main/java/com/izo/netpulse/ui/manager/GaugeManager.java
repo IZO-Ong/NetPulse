@@ -20,7 +20,10 @@ public class GaugeManager {
         this.progressArc = progressArc;
         this.needleCircle = needleCircle;
         this.speedValueLabel = speedValueLabel;
+
         currentSweep.addListener((obs, old, newVal) -> updateNeedlePosition(newVal.doubleValue()));
+
+        updateNeedlePosition(0);
     }
 
     public void updateGauge(double mbps, double maxSpeed) {
