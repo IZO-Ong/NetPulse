@@ -27,7 +27,7 @@ public class PrimaryStageInitializer implements ApplicationListener<StageReadyEv
             Stage stage = event.getStage();
             FXMLLoader fxmlLoader = new FXMLLoader(new ClassPathResource("/fxml/netpulse.fxml").getURL());
             fxmlLoader.setControllerFactory(context::getBean);
-            
+
             Parent root = fxmlLoader.load();
             stage.setScene(new Scene(root));
             stage.show();
