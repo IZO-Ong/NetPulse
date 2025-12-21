@@ -7,6 +7,7 @@
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.shape.Arc?>
 <?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.Group?>
 
 <VBox styleClass="main-container"
       stylesheets="@../style/style.css"
@@ -44,22 +45,32 @@
     <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <Tab text="SPEED TEST">
             <VBox styleClass="speed-test-container" spacing="30" VBox.vgrow="ALWAYS">
-                <StackPane alignment="CENTER" VBox.vgrow="ALWAYS">
+                <StackPane VBox.vgrow="ALWAYS">
                     <Pane styleClass="gauge-pane" maxWidth="-Infinity" maxHeight="-Infinity" StackPane.alignment="CENTER">
                         <Arc centerX="200" centerY="200" radiusX="120" radiusY="120"
                              startAngle="60" length="-300" styleClass="gauge-arc-bg"/>
 
                         <Arc fx:id="progressArc" centerX="200" centerY="200" radiusX="120" radiusY="120"
-                             startAngle="60" styleClass="gauge-arc-progress" />
+                             startAngle="60" styleClass="progress-download" />
 
                         <Circle fx:id="needleCircle" centerX="200" centerY="200" radius="6"
-                                styleClass="gauge-needle" />
+                                styleClass="progress-download-needle" />
 
-                        <Label text="0" layoutX="275" layoutY="80" styleClass="gauge-marker-primary"/>
-                        <Label text="60" layoutX="330" layoutY="230" styleClass="gauge-marker"/>
-                        <Label text="125" layoutX="185" layoutY="335" styleClass="gauge-marker"/>
-                        <Label text="190" layoutX="50" layoutY="230" styleClass="gauge-marker"/>
-                        <Label text="250+" layoutX="95" layoutY="80" styleClass="gauge-marker"/>
+                        <Group fx:id="downloadMarkers">
+                            <Label text="0" layoutX="275" layoutY="80" styleClass="gauge-marker-primary"/>
+                            <Label text="60" layoutX="330" layoutY="230" styleClass="gauge-marker"/>
+                            <Label text="125" layoutX="190" layoutY="335" styleClass="gauge-marker"/>
+                            <Label text="190" layoutX="50" layoutY="230" styleClass="gauge-marker"/>
+                            <Label text="250+" layoutX="95" layoutY="80" styleClass="gauge-marker"/>
+                        </Group>
+
+                        <Group fx:id="uploadMarkers" opacity="0.0" scaleX="0.5" scaleY="0.5">
+                            <Label text="0" layoutX="275" layoutY="80" styleClass="gauge-marker-primary"/>
+                            <Label text="25" layoutX="330" layoutY="230" styleClass="gauge-marker"/>
+                            <Label text="50" layoutX="190" layoutY="335" styleClass="gauge-marker"/>
+                            <Label text="75" layoutX="55" layoutY="230" styleClass="gauge-marker"/>
+                            <Label text="100+" layoutX="95" layoutY="80" styleClass="gauge-marker"/>
+                        </Group>
 
                         <VBox layoutX="100" layoutY="140" styleClass="speed-display-box" mouseTransparent="true">
                             <Label fx:id="speedValueLabel" text="0.0" styleClass="speed-value-label"/>

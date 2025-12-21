@@ -8,6 +8,7 @@
     -color-bg-header: #1e1e1e;
     -color-bg-surface: #0c0c0c;
     -color-green-primary: #1DB954;
+    -color-blue-primary: #67c1f5;
     -color-green-hover: #1ed760;
     -color-text-main: white;
     -color-text-muted: #b3b3b3;
@@ -106,7 +107,7 @@
     -fx-stroke-line-cap: round;
 }
 
-.gauge-arc-progress {
+.progress-download {
     -fx-stroke: -color-green-primary;
     -fx-stroke-width: 15;
     -fx-fill: transparent;
@@ -114,10 +115,23 @@
     -fx-effect: dropshadow(three-pass-box, -color-green-primary, 15, 0.05, 0, 0);
 }
 
-.gauge-needle {
+.progress-download-needle {
     -fx-fill: white;
     -fx-stroke: -color-green-primary;
     -fx-stroke-width: 2;
+    -fx-effect: glow(0.8);
+}
+
+.progress-upload {
+    -fx-stroke: -color-blue-primary;
+    -fx-stroke-width: 15;
+    -fx-fill: transparent;
+    -fx-stroke-line-cap: round;
+    -fx-effect: dropshadow(three-pass-box, -color-blue-primary, 15, 0.05, 0, 0);
+}
+
+.progress-upload-needle {
+    -fx-stroke: -color-blue-primary;
     -fx-effect: glow(0.8);
 }
 
@@ -190,19 +204,19 @@
 }
 
 .history-line-chart .default-color0.chart-series-line {
-    -fx-stroke: #1DB954;
+    -fx-stroke: -color-green-primary;
 }
 
 .history-line-chart .default-color0.chart-line-symbol {
-    -fx-background-color: #1DB954, white;
+    -fx-background-color: -color-green-primary, white;
 }
 
 .history-line-chart .default-color1.chart-series-line {
-    -fx-stroke: #67c1f5;
+    -fx-stroke: -color-blue-primary;
 }
 
 .history-line-chart .default-color1.chart-line-symbol {
-    -fx-background-color: #67c1f5, white;
+    -fx-background-color: -color-blue-primary, white;
 }
 
 .axis {
