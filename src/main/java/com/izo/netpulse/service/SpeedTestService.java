@@ -29,14 +29,14 @@ public class SpeedTestService {
     private volatile boolean isCancelled = false;
     private long lastUpdateTick = 0;
 
-    public interface PulseCallback {
+    public interface TestCallback {
         void onInstantUpdate(double mbps);
         void onComplete(double averageMbps);
         void onError(String msg);
     }
 
     // Download phase with Okhttp
-    public void runDownloadTest(PulseCallback callback) {
+    public void runDownloadTest(TestCallback callback) {
         isCancelled = false;
         String url = "https://speed.cloudflare.com/__down?bytes=150000000";
         activeOkCall = okClient.newCall(new Request.Builder().url(url).build());
@@ -77,7 +77,7 @@ public class SpeedTestService {
     }
 
     // Upload phase with JSpeedTest
-    public void runUploadTest(PulseCallback callback) {
+    public void runUploadTest(TestCallback callback) {
         isCancelled = false;
         String url = "https://speed.cloudflare.com/__up";
         List<Double> uploadSamples = new ArrayList<>();

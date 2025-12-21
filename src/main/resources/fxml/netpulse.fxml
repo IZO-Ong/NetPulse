@@ -8,6 +8,7 @@
 <?import javafx.scene.shape.Arc?>
 <?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.Group?>
+<?import javafx.geometry.Insets?>
 
 <VBox styleClass="main-container"
       stylesheets="@../style/style.css"
@@ -94,6 +95,10 @@
 
         <Tab text="HISTORY">
             <VBox styleClass="history-container" spacing="10" VBox.vgrow="ALWAYS">
+                <HBox alignment="CENTER_LEFT" spacing="10">
+                    <Label text="Time Range:" style="-fx-text-fill: white;" />
+                    <ComboBox fx:id="timeRangeSelector" onAction="#handleTimeRangeChange" prefWidth="150" />
+                </HBox>
                 <LineChart fx:id="historyLineChart"
                            animated="false"
                            legendSide="TOP"
@@ -106,6 +111,33 @@
                         <NumberAxis side="LEFT" label="Speed (Mbps)" />
                     </yAxis>
                 </LineChart>
+            </VBox>
+        </Tab>
+
+        <Tab text="SETTINGS">
+            <VBox spacing="25" styleClass="settings-container">
+                <padding>
+                    <Insets top="40" right="40" bottom="40" left="40"/>
+                </padding>
+
+                <Label text="Background Monitoring" styleClass="settings-header"/>
+
+                <HBox alignment="CENTER_LEFT" spacing="15">
+                    <CheckBox fx:id="backgroundMonitorToggle"
+                              text="Enable Background Checks"
+                              onAction="#handleMonitorSettingsChange"
+                              styleClass="settings-checkbox"/>
+                </HBox>
+
+                <VBox spacing="10">
+                    <Label text="Check Frequency" styleClass="settings-label"/>
+                    <ComboBox fx:id="monitorIntervalSelector"
+                              onAction="#handleMonitorSettingsChange"
+                              prefWidth="200"
+                              promptText="Select interval"/>
+                    <Label text="Tests will run in the background and save results to history."
+                           styleClass="settings-hint"/>
+                </VBox>
             </VBox>
         </Tab>
     </TabPane>

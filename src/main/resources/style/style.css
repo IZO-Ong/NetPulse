@@ -203,6 +203,32 @@
     -fx-scale-y: 1.05;
 }
 
+/* DROPDOWN */
+.combo-box {
+    -fx-background-color: -color-bg-header;
+    -fx-border-color: -color-border;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+}
+
+.combo-box .label {
+    -fx-text-fill: -color-text-main;
+}
+
+.combo-box .cell {
+    -fx-background-color: -color-bg-header;
+    -fx-text-fill: -color-text-main;
+}
+
+.combo-box .cell:hover {
+    -fx-background-color: -color-green-primary;
+}
+
+.combo-box .list-view {
+    -fx-background-color: -color-bg-header;
+    -fx-border-color: -color-border;
+}
+
 /* CHART */
 .history-container {
     -fx-padding: 20;

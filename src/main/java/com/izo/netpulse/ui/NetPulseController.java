@@ -4,8 +4,11 @@ import com.izo.netpulse.model.SpeedTestResult;
 import com.izo.netpulse.repository.SpeedRepository;
 import com.izo.netpulse.service.SpeedFeedbackService;
 import com.izo.netpulse.service.SpeedTestService;
+import com.izo.netpulse.service.BackgroundMonitorService;
 import com.izo.netpulse.ui.manager.GaugeManager;
 import com.izo.netpulse.ui.manager.WindowManager;
+import com.izo.netpulse.ui.manager.TimeRangeManager;
+import com.izo.netpulse.ui.manager.BackgroundMonitorManager;
 import com.izo.netpulse.ui.util.AnimationUtility;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -19,18 +22,20 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.CheckBox;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.util.List;
 import javafx.util.StringConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -40,6 +45,13 @@ public class NetPulseController {
     private final SpeedTestService speedService;
     private final SpeedRepository repository;
     private final SpeedFeedbackService feedbackService;
+    private final BackgroundMonitorService backgroundMonitorService;
+
+    // managers
+    private GaugeManager gaugeManager;
+    private TimeRangeManager timeRangeManager;
+    private BackgroundMonitorManager monitorManager;
+    private final WindowManager windowManager = new WindowManager();
 
     // FXML components
     @FXML private Arc progressArc;
@@ -47,15 +59,15 @@ public class NetPulseController {
     @FXML private Group downloadMarkers;
     @FXML private Group uploadMarkers;
     @FXML private LineChart<Number, Number> historyLineChart;
+    @FXML private ComboBox<String> timeRangeSelector;
     @FXML private NumberAxis historyXAxis;
     @FXML private Label statusLabel;
     @FXML private Label speedValueLabel;
     @FXML private Label speedFeedbackLabel;
     @FXML private SVGPath maximizeIcon;
     @FXML private Button actionButton;
-
-    private GaugeManager gaugeManager;
-    private final WindowManager windowManager = new WindowManager();
+    @FXML private CheckBox backgroundMonitorToggle;
+    @FXML private ComboBox<String> monitorIntervalSelector;
 
     // state variables
     private boolean isTestRunning = false;
@@ -66,6 +78,21 @@ public class NetPulseController {
     @FXML
     public void initialize() {
         gaugeManager = new GaugeManager(progressArc, needleCircle, speedValueLabel);
+        timeRangeManager = new TimeRangeManager(timeRangeSelector);
+
+        // Everything related to background monitoring happens inside this one call
+        monitorManager = new BackgroundMonitorManager(
+                backgroundMonitorService,
+                backgroundMonitorToggle,
+                monitorIntervalSelector,
+                this::refreshHistory
+        );
+
+        refreshHistory();
+    }
+
+    @FXML
+    private void handleTimeRangeChange() {
         refreshHistory();
     }
 
@@ -89,7 +116,7 @@ public class NetPulseController {
 
         prepareUIForDownload();
 
-        speedService.runDownloadTest(new SpeedTestService.PulseCallback() {
+        speedService.runDownloadTest(new SpeedTestService.TestCallback() {
             @Override
             public void onInstantUpdate(double mbps) {
                 gaugeManager.updateGauge(mbps, activeMaxSpeed);
@@ -111,7 +138,6 @@ public class NetPulseController {
     private void startUploadTransition(double avgDl) {
         statusLabel.setText("Preparing Upload...");
 
-        // reset gauge while still on Download scale (250) to prevent snapping
         Timeline reset = gaugeManager.resetGauge(800);
 
         reset.setOnFinished(e -> {
@@ -129,7 +155,7 @@ public class NetPulseController {
                 if (!isTestRunning) return;
                 statusLabel.setText("Testing Upload... (7s)");
 
-                speedService.runUploadTest(new SpeedTestService.PulseCallback() {
+                speedService.runUploadTest(new SpeedTestService.TestCallback() {
                     @Override
                     public void onInstantUpdate(double mbps) {
                         if (isTestRunning) gaugeManager.updateGauge(mbps, activeMaxSpeed);
@@ -212,13 +238,19 @@ public class NetPulseController {
     // HISTORY CHART LOGIC
 
     private void refreshHistory() {
-        List<SpeedTestResult> history = repository.findAll();
-        Platform.runLater(() -> loadHistoryData(history));
+        List<SpeedTestResult> allResults = repository.findAll();
+        LocalDateTime cutoff = timeRangeManager.getCutoffDate();
+
+        List<SpeedTestResult> filteredResults = allResults.stream()
+                .filter(r -> cutoff == null || r.getTimestamp().isAfter(cutoff))
+                .toList();
+
+        Platform.runLater(() -> loadHistoryData(filteredResults));
     }
 
     public void loadHistoryData(List<SpeedTestResult> historyList) {
         historyLineChart.getData().clear();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM/dd HH:mm");
 
         historyXAxis.setTickLabelFormatter(new StringConverter<>() {
             @Override public String toString(Number t) {
@@ -241,6 +273,12 @@ public class NetPulseController {
 
         historyLineChart.getData().add(downloadSeries);
         historyLineChart.getData().add(uploadSeries);
+    }
+
+    // BG MONITOR LOGIC
+    @FXML
+    private void handleMonitorSettingsChange() {
+        monitorManager.handleSettingsChange();
     }
 
     // WINDOW AND EVENT HANDLERS
