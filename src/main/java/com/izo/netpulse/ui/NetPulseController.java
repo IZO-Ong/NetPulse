@@ -82,6 +82,11 @@ public class NetPulseController {
 
     private void startTestSequence() {
         isTestRunning = true;
+
+        if (!actionButton.getStyleClass().contains("button-cancel")) {
+            actionButton.getStyleClass().add("button-cancel");
+        }
+
         prepareUIForDownload();
 
         speedService.runDownloadTest(new SpeedTestService.PulseCallback() {
@@ -253,22 +258,6 @@ public class NetPulseController {
     }
 
     @FXML public void handleClose() { Platform.exit(); System.exit(0); }
-
-    @FXML
-    private void handleHoverStart() {
-        if (isTestRunning) {
-            actionButton.setText("CANCEL TEST");
-            if (!actionButton.getStyleClass().contains("button-cancel")) {
-                actionButton.getStyleClass().add("button-cancel");
-            }
-        }
-    }
-
-    @FXML
-    private void handleHoverEnd() {
-        actionButton.setText(isTestRunning ? "CANCEL TEST" : "RUN TEST");
-        actionButton.getStyleClass().remove("button-cancel");
-    }
 
     private Stage getStage(javafx.event.Event event) {
         return (Stage) ((Node) event.getSource()).getScene().getWindow();

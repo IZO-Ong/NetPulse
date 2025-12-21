@@ -88,8 +88,6 @@
                 <Button fx:id="actionButton"
                         text="RUN TEST"
                         onAction="#handleActionButtonClick"
-                        onMouseEntered="#handleHoverStart"
-                        onMouseExited="#handleHoverEnd"
                         styleClass="pulse-button"/>
             </VBox>
         </Tab>
