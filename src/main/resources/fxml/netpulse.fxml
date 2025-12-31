@@ -83,11 +83,17 @@
 
         <Tab text="HISTORY">
             <VBox styleClass="history-container" spacing="10" VBox.vgrow="ALWAYS">
+                <padding>
+                    <Insets top="20" right="20" bottom="10" left="15"/>
+                </padding>
+
                 <HBox alignment="CENTER_LEFT" spacing="10">
                     <Label text="Time Range:" styleClass="settings-label" />
                     <ComboBox fx:id="timeRangeSelector" onAction="#handleTimeRangeChange" prefWidth="150" />
                 </HBox>
-                <LineChart fx:id="historyLineChart" animated="false" legendSide="TOP" VBox.vgrow="ALWAYS" styleClass="history-line-chart">
+
+                <LineChart fx:id="historyLineChart" animated="false" legendSide="TOP"
+                           VBox.vgrow="ALWAYS" styleClass="history-line-chart">
                     <xAxis><NumberAxis fx:id="historyXAxis" side="BOTTOM" label="Time" forceZeroInRange="false" /></xAxis>
                     <yAxis><NumberAxis side="LEFT" label="Speed (Mbps)" /></yAxis>
                 </LineChart>

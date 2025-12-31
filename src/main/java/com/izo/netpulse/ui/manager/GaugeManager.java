@@ -14,14 +14,12 @@ public class GaugeManager {
     private final Arc progressArc;
     private final Circle needleCircle;
     private final Label speedValueLabel;
-    private final Label statusLabel; // Added field
     private final DoubleProperty currentSweep = new SimpleDoubleProperty(0);
 
-    public GaugeManager(Arc progressArc, Circle needleCircle, Label speedValueLabel, Label statusLabel) {
+    public GaugeManager(Arc progressArc, Circle needleCircle, Label speedValueLabel) {
         this.progressArc = progressArc;
         this.needleCircle = needleCircle;
         this.speedValueLabel = speedValueLabel;
-        this.statusLabel = statusLabel;
 
         currentSweep.addListener((obs, old, newVal) -> updateNeedlePosition(newVal.doubleValue()));
 
@@ -37,11 +35,9 @@ public class GaugeManager {
     }
 
     public Timeline resetGauge(int ms) {
-        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(ms),
+        return new Timeline(new KeyFrame(Duration.millis(ms),
                 new KeyValue(currentSweep, 0),
                 new KeyValue(speedValueLabel.textProperty(), "0.0")));
-
-        return timeline;
     }
 
     private void updateNeedlePosition(double sweep) {

@@ -1,5 +1,3 @@
-/* Design Token */
-
 .root {
     -color-brand: #1DB954;
     -color-brand-hover: #1ed760;
@@ -22,7 +20,7 @@
     -color-window-hover: #333333;
 }
 
-/* Light Mode Overrides */
+/* Light mode */
 .light-mode {
     -fx-base: #f4f4f4;
 
@@ -38,14 +36,12 @@
     -color-window-hover: #dcdcdc;
 }
 
-/* Global and Layout */
+/* Global Layout */
 
 .main-container {
     -fx-background-color: -color-bg-main;
 }
 
-/* Universal Label Support */
-/* Note: We use .text here, which is why we must override it specifically in the button later */
 .label, .settings-label, .text {
     -fx-text-fill: -color-text-main;
     -fx-fill: -color-text-main;
@@ -97,6 +93,8 @@
     -fx-background-color: transparent;
     -fx-padding: 10 30;
     -fx-cursor: hand;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
 }
 
 .tab .tab-label {
@@ -111,11 +109,6 @@
 
 .tab:selected .tab-label {
     -fx-text-fill: -color-text-main;
-}
-
-.tab-pane .tab:focused .focus-indicator {
-    -fx-border-color: transparent;
-    -fx-border-width: 0;
 }
 
 /* Gauge Components */
@@ -154,7 +147,7 @@
     -fx-opacity: 0.8;
 }
 
-/* Download Styles */
+/* Download styles */
 .progress-download {
     -fx-stroke: -color-brand;
     -fx-stroke-width: 15;
@@ -170,7 +163,7 @@
     -fx-effect: dropshadow(three-pass-box, -color-brand, 10, 0.7, 0, 0);
 }
 
-/* Upload Styles */
+/* Upload styles */
 .progress-upload {
     -fx-stroke: -color-accent-blue;
     -fx-stroke-width: 15;
