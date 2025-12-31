@@ -36,7 +36,7 @@
 
     <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <Tab text="SPEED TEST">
-            <VBox styleClass="speed-test-container" spacing="30" VBox.vgrow="ALWAYS" alignment="CENTER">
+            <VBox styleClass="speed-test-container" spacing="10" VBox.vgrow="ALWAYS" alignment="CENTER">
                 <StackPane VBox.vgrow="ALWAYS">
                     <StackPane maxWidth="400" maxHeight="400" StackPane.alignment="CENTER">
                         <Pane styleClass="gauge-pane">

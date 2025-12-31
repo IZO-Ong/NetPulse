@@ -257,7 +257,9 @@ public class NetPulseController {
             dlSeries.getData().add(new XYChart.Data<>(epoch, result.getDownloadMbps()));
             ulSeries.getData().add(new XYChart.Data<>(epoch, result.getUploadMbps()));
         }
-        historyLineChart.getData().addAll(dlSeries, ulSeries);
+
+        historyLineChart.getData().add(dlSeries);
+        historyLineChart.getData().add(ulSeries);
     }
 
     // Window Handlers
