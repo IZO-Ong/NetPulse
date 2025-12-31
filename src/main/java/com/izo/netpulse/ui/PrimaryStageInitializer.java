@@ -7,7 +7,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -25,7 +24,14 @@ public class PrimaryStageInitializer implements ApplicationListener<StageReadyEv
     public void onApplicationEvent(StageReadyEvent event) {
         try {
             Stage stage = event.getStage();
-            FXMLLoader fxmlLoader = new FXMLLoader(new ClassPathResource("/fxml/netpulse.fxml").getURL());
+
+            java.net.URL fxmlUrl = getClass().getResource("/fxml/netpulse.fxml");
+
+            if (fxmlUrl == null) {
+                throw new RuntimeException("Could not find fxml/netpulse.fxml. Check your resources folder.");
+            }
+
+            FXMLLoader fxmlLoader = new FXMLLoader(fxmlUrl);
             fxmlLoader.setControllerFactory(context::getBean);
 
             Parent root = fxmlLoader.load();
