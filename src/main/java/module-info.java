@@ -28,6 +28,9 @@ module com.izo.netpulse {
     requires static lombok;
     requires annotations;
 
+    // kotlin for okhttp
+    requires kotlin.stdlib;
+
     opens fxml to javafx.fxml;
     opens style to javafx.graphics;
 

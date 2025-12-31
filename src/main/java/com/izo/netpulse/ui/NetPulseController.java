@@ -8,7 +8,6 @@ import com.izo.netpulse.service.BackgroundMonitorService;
 import com.izo.netpulse.ui.manager.*;
 import com.izo.netpulse.ui.util.AnimationUtility;
 
-import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -28,7 +27,6 @@ import javafx.scene.shape.Arc;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import javafx.util.StringConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
