@@ -84,7 +84,7 @@ class NetpulseApplicationTests {
         repository.save(result);
         assertEquals(1, repository.count(), "Database count should be exactly 1");
 
-        SpeedTestResult fetched = repository.findAll().get(0);
+        SpeedTestResult fetched = repository.findAll().getFirst();
         assertEquals(100.5, fetched.getDownloadMbps());
     }
 
@@ -111,15 +111,13 @@ class NetpulseApplicationTests {
     @DisplayName("OkHttp: Verify service handles network error gracefully")
     void testNetworkErrorHandling() {
         mockWebServer.enqueue(new MockResponse().setResponseCode(404));
-        assertDoesNotThrow(() -> {
-            speedTestService.runDownloadTest(new SpeedTestService.TestCallback() {
-                @Override public void onInstantUpdate(double mbps) {}
-                @Override public void onComplete(double avg) {}
-                @Override public void onError(String msg) {
-                    assertTrue(msg.contains("Error"), "Callback should report an error");
-                }
-            });
-        });
+        assertDoesNotThrow(() -> speedTestService.runDownloadTest(new SpeedTestService.TestCallback() {
+            @Override public void onInstantUpdate(double mbps) {}
+            @Override public void onComplete(double avg) {}
+            @Override public void onError(String msg) {
+                assertTrue(msg.contains("Error"), "Callback should report an error");
+            }
+        }));
     }
 
     @Test

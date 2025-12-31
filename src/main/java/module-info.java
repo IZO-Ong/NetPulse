@@ -35,7 +35,7 @@ module com.izo.netpulse {
     opens style to javafx.graphics;
 
     opens com.izo.netpulse to spring.core, spring.beans, spring.context, javafx.fxml;
-    opens com.izo.netpulse.ui to javafx.fxml, spring.beans;
+    opens com.izo.netpulse.ui to spring.core, spring.beans, javafx.fxml;
     opens com.izo.netpulse.ui.manager to spring.beans;
     opens com.izo.netpulse.service to spring.core, spring.beans, spring.context;
     opens com.izo.netpulse.model to org.hibernate.orm.core, spring.core;

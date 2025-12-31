@@ -98,6 +98,25 @@
             </VBox>
         </Tab>
 
+        <Tab text="DIAGNOSTICS">
+            <VBox spacing="20" alignment="TOP_CENTER" style="-fx-padding: 20;">
+                <Label text="Network Diagnostic Tools"
+                       style="-fx-font-size: 22px; -fx-font-weight: bold;"
+                       styleClass="main-label"/>
+
+                <Button fx:id="diagButton"
+                        text="RUN DIAGNOSTICS"
+                        onAction="#runDiagnostics"
+                        styleClass="pulse-button"/>
+
+                <TextArea fx:id="diagnosticsArea"
+                          editable="false"
+                          wrapText="true"
+                          VBox.vgrow="ALWAYS"
+                          maxWidth="1.7976931348623157E308"
+                          promptText="Click 'Run Diagnostics' to start..."/>
+            </VBox>
+        </Tab>
         <Tab text="SETTINGS">
             <VBox spacing="25" styleClass="settings-container">
                 <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>

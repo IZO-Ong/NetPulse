@@ -264,3 +264,42 @@
 .axis {
     -fx-tick-label-fill: -color-text-muted;
 }
+
+/* Diagnostics TextArea */
+.text-area {
+    -fx-font-family: 'Consolas', 'Monospaced';
+    -fx-font-size: 13px;
+    -fx-text-fill: white;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+.text-area .content,
+.text-area .viewport {
+    -fx-background-color: #1e1e1e;
+}
+
+.text-area .content {
+    -fx-border-color: -color-border;
+    -fx-border-radius: 5;
+    -fx-background-radius: 5;
+}
+
+.text-area:focused .content,
+.text-area:focused .viewport {
+    -fx-background-color: #1e1e1e;
+}
+
+/* Light mode */
+.light-mode .text-area {
+    -fx-text-fill: #121212;
+}
+
+.light-mode .text-area .content,
+.light-mode .text-area .viewport {
+    -fx-background-color: white;
+}
+
+.light-mode .text-area .content {
+    -fx-border-color: #cccccc;
+}

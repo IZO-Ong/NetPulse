@@ -2,6 +2,7 @@ package com.izo.netpulse.ui;
 
 import com.izo.netpulse.model.SpeedTestResult;
 import com.izo.netpulse.repository.SpeedRepository;
+import com.izo.netpulse.service.DiagnosticService;
 import com.izo.netpulse.service.SpeedFeedbackService;
 import com.izo.netpulse.service.SpeedTestService;
 import com.izo.netpulse.service.BackgroundMonitorService;
@@ -17,10 +18,7 @@ import javafx.scene.Node;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.CheckBox;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Arc;
@@ -29,8 +27,10 @@ import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.net.InetAddress;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,6 +44,7 @@ public class NetPulseController {
     private final SpeedRepository repository;
     private final SpeedFeedbackService feedbackService;
     private final BackgroundMonitorService monitorService;
+    @Autowired private DiagnosticService diagnosticService;
 
     // Managers
     private GaugeManager gaugeManager;
@@ -58,6 +59,7 @@ public class NetPulseController {
     @FXML private Circle needleCircle;
     @FXML private Group downloadMarkers;
     @FXML private Group uploadMarkers;
+    @FXML private TextArea diagnosticsArea;
     @FXML private LineChart<Number, Number> historyLineChart;
     @FXML private ComboBox<String> timeRangeSelector;
     @FXML private NumberAxis historyXAxis;
@@ -66,6 +68,7 @@ public class NetPulseController {
     @FXML private Label speedFeedbackLabel;
     @FXML private SVGPath maximizeIcon;
     @FXML private Button actionButton;
+    @FXML private Button diagButton;
     @FXML private CheckBox lightModeToggle;
     @FXML private CheckBox backgroundMonitorToggle;
     @FXML private ComboBox<String> monitorIntervalSelector;
@@ -273,6 +276,57 @@ public class NetPulseController {
         historyLineChart.getData().add(dlSeries);
         historyLineChart.getData().add(ulSeries);
     }
+
+    // Diagnostics
+
+    @FXML
+    public void runDiagnostics() {
+        diagButton.setDisable(true);
+        diagnosticsArea.clear();
+        updateDiagArea(">>> Starting Network Scan...");
+
+        Thread diagThread = new Thread(() -> {
+            try {
+                // Hardware
+                updateDiagArea("Local Adapter: " + diagnosticService.getActiveInterface());
+
+                // Public ISP
+                updateDiagArea("\nLocating Public ISP...");
+                updateDiagArea(diagnosticService.getServerLocation());
+
+                // DNS and resolution speed
+                updateDiagArea("\nDNS Configuration: " + diagnosticService.getDnsServers());
+                updateDiagArea("DNS Resolution Speed (google.com): " + diagnosticService.testDnsSpeed("google.com"));
+
+                // HTTP port check
+                updateDiagArea("Web Connectivity (Port 80): " + diagnosticService.checkWebReachability());
+
+                // Gateway
+                updateDiagArea("\nIdentifying First Hop (Gateway)...");
+                updateDiagArea("Router Response: " + diagnosticService.getFirstHop());
+
+                // Global Pings
+                updateDiagArea("\nTesting Global Latency...");
+                updateDiagArea("Google (8.8.8.8): " + diagnosticService.getGlobalPing("8.8.8.8"));
+                updateDiagArea("Cloudflare (1.1.1.1): " + diagnosticService.getGlobalPing("1.1.1.1"));
+
+                Platform.runLater(() -> {
+                    diagnosticsArea.appendText("\n>>> Scan Complete.");
+                    diagButton.setDisable(false);
+                });
+            } catch (Exception e) {
+                updateDiagArea("\n[CRITICAL ERROR]: " + e.getMessage());
+                Platform.runLater(() -> diagButton.setDisable(false));
+            }
+        });
+        diagThread.setDaemon(true);
+        diagThread.start();
+    }
+
+    private void updateDiagArea(String text) {
+        Platform.runLater(() -> diagnosticsArea.appendText(text + "\n"));
+    }
+
 
     // Window Handlers
 
