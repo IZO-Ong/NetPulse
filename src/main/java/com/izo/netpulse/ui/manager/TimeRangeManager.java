@@ -37,11 +37,7 @@ public class TimeRangeManager {
             case LAST_WEEK     -> now.minusWeeks(1);
             case LAST_MONTH    -> now.minusMonths(1);
             case LAST_YEAR     -> now.minusYears(1);
-            default            -> null; // All Time
+            default            -> null;
         };
-    }
-
-    public String getSelectedValue() {
-        return comboBox.getValue();
     }
 }

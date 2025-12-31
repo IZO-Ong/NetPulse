@@ -14,12 +14,14 @@ public class GaugeManager {
     private final Arc progressArc;
     private final Circle needleCircle;
     private final Label speedValueLabel;
+    private final Label statusLabel; // Added field
     private final DoubleProperty currentSweep = new SimpleDoubleProperty(0);
 
-    public GaugeManager(Arc progressArc, Circle needleCircle, Label speedValueLabel) {
+    public GaugeManager(Arc progressArc, Circle needleCircle, Label speedValueLabel, Label statusLabel) {
         this.progressArc = progressArc;
         this.needleCircle = needleCircle;
         this.speedValueLabel = speedValueLabel;
+        this.statusLabel = statusLabel;
 
         currentSweep.addListener((obs, old, newVal) -> updateNeedlePosition(newVal.doubleValue()));
 
@@ -29,18 +31,26 @@ public class GaugeManager {
     public void updateGauge(double mbps, double maxSpeed) {
         speedValueLabel.setText(String.format("%.1f", mbps));
         double targetSweep = Math.min(mbps / maxSpeed, 1.0) * -300;
-        new Timeline(new KeyFrame(Duration.millis(200), new KeyValue(currentSweep, targetSweep))).play();
+
+        new Timeline(new KeyFrame(Duration.millis(200),
+                new KeyValue(currentSweep, targetSweep))).play();
     }
 
     public Timeline resetGauge(int ms) {
-        return new Timeline(new KeyFrame(Duration.millis(ms),
+        Timeline timeline = new Timeline(new KeyFrame(Duration.millis(ms),
                 new KeyValue(currentSweep, 0),
                 new KeyValue(speedValueLabel.textProperty(), "0.0")));
+
+        return timeline;
     }
 
     private void updateNeedlePosition(double sweep) {
         progressArc.setLength(sweep);
+
+        // start angle is 60 degrees. Sweep is negative (clockwise).
         double angleRad = Math.toRadians(60 + sweep);
+
+        // Assuming gauge center is 200,200 and radius is 120
         needleCircle.setCenterX(200 + 120 * Math.cos(angleRad));
         needleCircle.setCenterY(200 - 120 * Math.sin(angleRad));
     }

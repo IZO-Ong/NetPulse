@@ -10,7 +10,8 @@
 <?import javafx.scene.Group?>
 <?import javafx.geometry.Insets?>
 
-<VBox styleClass="main-container"
+<VBox fx:id="mainContainer"
+      styleClass="main-container"
       stylesheets="@../style/style.css"
       xmlns="http://javafx.com/javafx" xmlns:fx="http://javafx.com/fxml"
       fx:controller="com.izo.netpulse.ui.NetPulseController"
@@ -20,123 +21,94 @@
     <HBox alignment="CENTER_RIGHT" styleClass="title-bar"
           onMousePressed="#handleMousePressed"
           onMouseDragged="#handleMouseDragged">
-
         <Text text="NetPulse Monitor" styleClass="header-text" />
         <Region HBox.hgrow="ALWAYS" />
-
         <Button onAction="#handleMinimise" styleClass="window-button">
-            <graphic>
-                <SVGPath content="M0,5 H10" styleClass="window-icon" />
-            </graphic>
+            <graphic><SVGPath content="M0,5 H10" styleClass="window-icon" /></graphic>
         </Button>
-
         <Button onAction="#handleMaximize" styleClass="window-button">
-            <graphic>
-                <SVGPath fx:id="maximizeIcon" content="M1,1 H9 V9 H1 V1 Z M2,2 V8 H8 V2 H2 Z" styleClass="window-icon" />
-            </graphic>
+            <graphic><SVGPath fx:id="maximizeIcon" content="M2,2 H8 V8 H2 Z" styleClass="window-icon" /></graphic>
         </Button>
-
         <Button onAction="#handleClose" styleClass="window-button-close">
-            <graphic>
-                <SVGPath content="M1,1 L9,9 M9,1 L1,9" styleClass="window-icon" />
-            </graphic>
+            <graphic><SVGPath content="M1,1 L9,9 M9,1 L1,9" styleClass="window-icon" /></graphic>
         </Button>
     </HBox>
 
     <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
-
         <Tab text="SPEED TEST">
-            <VBox styleClass="speed-test-container" spacing="30" VBox.vgrow="ALWAYS">
+            <VBox styleClass="speed-test-container" spacing="30" VBox.vgrow="ALWAYS" alignment="CENTER">
                 <StackPane VBox.vgrow="ALWAYS">
-                    <Pane styleClass="gauge-pane" maxWidth="-Infinity" maxHeight="-Infinity" StackPane.alignment="CENTER">
+                    <StackPane maxWidth="400" maxHeight="400" StackPane.alignment="CENTER">
+                        <Pane styleClass="gauge-pane">
+                            <Arc centerX="200" centerY="200" radiusX="120" radiusY="120"
+                                 startAngle="60" length="-300" styleClass="gauge-arc-bg"/>
 
-                        <Arc centerX="200" centerY="200" radiusX="120" radiusY="120"
-                             startAngle="60" length="-300" styleClass="gauge-arc-bg"/>
+                            <Arc fx:id="progressArc" centerX="200" centerY="200" radiusX="120" radiusY="120"
+                                 startAngle="60" styleClass="progress-download" />
 
-                        <Arc fx:id="progressArc" centerX="200" centerY="200" radiusX="120" radiusY="120"
-                             startAngle="60" styleClass="progress-download" />
+                            <Circle fx:id="needleCircle" centerX="200" centerY="200" radius="6"
+                                    styleClass="progress-download-needle" />
 
-                        <Circle fx:id="needleCircle" centerX="200" centerY="200" radius="6"
-                                styleClass="progress-download-needle" />
+                            <Group fx:id="downloadMarkers" managed="false" mouseTransparent="true">
+                                <Label text="0" layoutX="275" layoutY="80" styleClass="gauge-marker-primary"/>
+                                <Label text="60" layoutX="330" layoutY="230" styleClass="gauge-marker"/>
+                                <Label text="125" layoutX="190" layoutY="335" styleClass="gauge-marker"/>
+                                <Label text="190" layoutX="50" layoutY="230" styleClass="gauge-marker"/>
+                                <Label text="250+" layoutX="95" layoutY="80" styleClass="gauge-marker"/>
+                            </Group>
 
-                        <Group fx:id="downloadMarkers" managed="false" mouseTransparent="true">
-                            <Label text="0" layoutX="275" layoutY="80" styleClass="gauge-marker-primary"/>
-                            <Label text="60" layoutX="330" layoutY="230" styleClass="gauge-marker"/>
-                            <Label text="125" layoutX="190" layoutY="335" styleClass="gauge-marker"/>
-                            <Label text="190" layoutX="50" layoutY="230" styleClass="gauge-marker"/>
-                            <Label text="250+" layoutX="95" layoutY="80" styleClass="gauge-marker"/>
-                        </Group>
+                            <Group fx:id="uploadMarkers" managed="false" mouseTransparent="true" opacity="0.0" scaleX="0.5" scaleY="0.5">
+                                <Label text="0" layoutX="275" layoutY="80" styleClass="gauge-marker-primary"/>
+                                <Label text="25" layoutX="330" layoutY="230" styleClass="gauge-marker"/>
+                                <Label text="50" layoutX="190" layoutY="335" styleClass="gauge-marker"/>
+                                <Label text="75" layoutX="55" layoutY="230" styleClass="gauge-marker"/>
+                                <Label text="100+" layoutX="95" layoutY="80" styleClass="gauge-marker"/>
+                            </Group>
 
-                        <Group fx:id="uploadMarkers" managed="false" mouseTransparent="true" opacity="0.0" scaleX="0.5" scaleY="0.5">
-                            <Label text="0" layoutX="275" layoutY="80" styleClass="gauge-marker-primary"/>
-                            <Label text="25" layoutX="330" layoutY="230" styleClass="gauge-marker"/>
-                            <Label text="50" layoutX="190" layoutY="335" styleClass="gauge-marker"/>
-                            <Label text="75" layoutX="55" layoutY="230" styleClass="gauge-marker"/>
-                            <Label text="100+" layoutX="95" layoutY="80" styleClass="gauge-marker"/>
-                        </Group>
-
-                        <VBox layoutX="100" layoutY="140" styleClass="speed-display-box" mouseTransparent="true">
-                            <Label fx:id="speedValueLabel" text="0.0" styleClass="speed-value-label"/>
-                            <Label fx:id="statusLabel" text="Ready for Testing!" styleClass="status-label"/>
-                        </VBox>
-                    </Pane>
+                            <VBox layoutX="100" layoutY="140" prefWidth="200" alignment="CENTER" mouseTransparent="true">
+                                <Label fx:id="speedValueLabel" text="0.0" styleClass="speed-value-label"/>
+                                <Label fx:id="statusLabel" text="Ready for Testing!" styleClass="status-label"/>
+                            </VBox>
+                        </Pane>
+                    </StackPane>
                 </StackPane>
 
-                <VBox styleClass="feedback-container" spacing="5">
+                <VBox styleClass="feedback-container" spacing="5" alignment="CENTER">
                     <Label fx:id="speedFeedbackLabel" styleClass="feedback-label" wrapText="true"/>
                 </VBox>
 
-                <Button fx:id="actionButton"
-                        text="RUN TEST"
-                        onAction="#handleActionButtonClick"
-                        styleClass="pulse-button"/>
+                <Button fx:id="actionButton" text="RUN TEST" onAction="#handleActionButtonClick" styleClass="pulse-button"/>
             </VBox>
         </Tab>
 
         <Tab text="HISTORY">
             <VBox styleClass="history-container" spacing="10" VBox.vgrow="ALWAYS">
                 <HBox alignment="CENTER_LEFT" spacing="10">
-                    <Label text="Time Range:" style="-fx-text-fill: white;" />
+                    <Label text="Time Range:" styleClass="settings-label" />
                     <ComboBox fx:id="timeRangeSelector" onAction="#handleTimeRangeChange" prefWidth="150" />
                 </HBox>
-                <LineChart fx:id="historyLineChart"
-                           animated="false"
-                           legendSide="TOP"
-                           VBox.vgrow="ALWAYS"
-                           styleClass="history-line-chart">
-                    <xAxis>
-                        <NumberAxis fx:id="historyXAxis" side="BOTTOM" label="Time" forceZeroInRange="false" />
-                    </xAxis>
-                    <yAxis>
-                        <NumberAxis side="LEFT" label="Speed (Mbps)" />
-                    </yAxis>
+                <LineChart fx:id="historyLineChart" animated="false" legendSide="TOP" VBox.vgrow="ALWAYS" styleClass="history-line-chart">
+                    <xAxis><NumberAxis fx:id="historyXAxis" side="BOTTOM" label="Time" forceZeroInRange="false" /></xAxis>
+                    <yAxis><NumberAxis side="LEFT" label="Speed (Mbps)" /></yAxis>
                 </LineChart>
             </VBox>
         </Tab>
 
         <Tab text="SETTINGS">
             <VBox spacing="25" styleClass="settings-container">
-                <padding>
-                    <Insets top="40" right="40" bottom="40" left="40"/>
-                </padding>
-
+                <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>
+                <VBox spacing="10">
+                    <Label text="Appearance" styleClass="settings-header"/>
+                    <CheckBox fx:id="lightModeToggle" text="Enable Light Mode" onAction="#handleThemeChange" styleClass="settings-checkbox"/>
+                </VBox>
                 <Label text="Background Monitoring" styleClass="settings-header"/>
-
                 <HBox alignment="CENTER_LEFT" spacing="15">
-                    <CheckBox fx:id="backgroundMonitorToggle"
-                              text="Enable Background Checks"
-                              onAction="#handleMonitorSettingsChange"
-                              styleClass="settings-checkbox"/>
+                    <CheckBox fx:id="backgroundMonitorToggle" text="Enable Background Checks" onAction="#handleMonitorSettingsChange" styleClass="settings-checkbox"/>
                 </HBox>
-
                 <VBox spacing="10">
                     <Label text="Check Frequency" styleClass="settings-label"/>
-                    <ComboBox fx:id="monitorIntervalSelector"
-                              onAction="#handleMonitorSettingsChange"
-                              prefWidth="200"
-                              promptText="Select interval"/>
-                    <Label text="Tests will run in the background and save results to history."
-                           styleClass="settings-hint"/>
+                    <ComboBox fx:id="monitorIntervalSelector" onAction="#handleMonitorSettingsChange" prefWidth="200" promptText="Select interval"/>
+                    <Label text="Tests will run in the background." styleClass="settings-hint"/>
                 </VBox>
             </VBox>
         </Tab>

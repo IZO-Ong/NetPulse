@@ -11,8 +11,8 @@ public class WindowManager {
     private double prevX, prevY, prevWidth, prevHeight;
     private boolean isMaximized = false;
 
-    private static final String MAXIMIZE_SVG = "M1,1 H9 V9 H1 V1 Z M2,2 V8 H8 V2 H2 Z";
-    private static final String RESTORE_SVG = "M2,4 H8 V10 H2 V4 Z M3,5 V9 H7 V5 H3 Z M4,1 H10 V7 H9 V2 H4 V1 Z";
+    private static final String MAXIMIZE_SVG = "M2,2 H8 V8 H2 Z";
+    private static final String RESTORE_SVG = "M2,4 H7 V9 H2 Z M4,2 H9 V7 H4 Z";
 
     public void handlePressed(MouseEvent e) { if (!isMaximized) { xOffset = e.getSceneX(); yOffset = e.getSceneY(); } }
 
