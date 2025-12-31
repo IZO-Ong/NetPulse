@@ -30,7 +30,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.net.InetAddress;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -283,39 +282,39 @@ public class NetPulseController {
     public void runDiagnostics() {
         diagButton.setDisable(true);
         diagnosticsArea.clear();
-        updateDiagArea(">>> Starting Network Scan...");
+        updateDiagnosticsArea(">>> Starting Network Scan...");
 
         Thread diagThread = new Thread(() -> {
             try {
                 // Hardware
-                updateDiagArea("Local Adapter: " + diagnosticService.getActiveInterface());
+                updateDiagnosticsArea("Local Adapter: " + diagnosticService.getActiveInterface());
 
                 // Public ISP
-                updateDiagArea("\nLocating Public ISP...");
-                updateDiagArea(diagnosticService.getServerLocation());
+                updateDiagnosticsArea("\nLocating Public ISP...");
+                updateDiagnosticsArea(diagnosticService.getServerLocation());
 
                 // DNS and resolution speed
-                updateDiagArea("\nDNS Configuration: " + diagnosticService.getDnsServers());
-                updateDiagArea("DNS Resolution Speed (google.com): " + diagnosticService.testDnsSpeed("google.com"));
+                updateDiagnosticsArea("\nDNS Configuration: " + diagnosticService.getDnsServers());
+                updateDiagnosticsArea("DNS Resolution Speed (google.com): " + diagnosticService.testDnsSpeed("google.com"));
 
                 // HTTP port check
-                updateDiagArea("Web Connectivity (Port 80): " + diagnosticService.checkWebReachability());
+                updateDiagnosticsArea("Web Connectivity (Port 80): " + diagnosticService.checkWebReachability());
 
                 // Gateway
-                updateDiagArea("\nIdentifying First Hop (Gateway)...");
-                updateDiagArea("Router Response: " + diagnosticService.getFirstHop());
+                updateDiagnosticsArea("\nIdentifying First Hop (Gateway)...");
+                updateDiagnosticsArea("Router Response: " + diagnosticService.getFirstHop());
 
                 // Global Pings
-                updateDiagArea("\nTesting Global Latency...");
-                updateDiagArea("Google (8.8.8.8): " + diagnosticService.getGlobalPing("8.8.8.8"));
-                updateDiagArea("Cloudflare (1.1.1.1): " + diagnosticService.getGlobalPing("1.1.1.1"));
+                updateDiagnosticsArea("\nTesting Global Latency...");
+                updateDiagnosticsArea("Google (8.8.8.8): " + diagnosticService.getGlobalPing("8.8.8.8"));
+                updateDiagnosticsArea("Cloudflare (1.1.1.1): " + diagnosticService.getGlobalPing("1.1.1.1"));
 
                 Platform.runLater(() -> {
                     diagnosticsArea.appendText("\n>>> Scan Complete.");
                     diagButton.setDisable(false);
                 });
             } catch (Exception e) {
-                updateDiagArea("\n[CRITICAL ERROR]: " + e.getMessage());
+                updateDiagnosticsArea("\n[CRITICAL ERROR]: " + e.getMessage());
                 Platform.runLater(() -> diagButton.setDisable(false));
             }
         });
@@ -323,7 +322,7 @@ public class NetPulseController {
         diagThread.start();
     }
 
-    private void updateDiagArea(String text) {
+    private void updateDiagnosticsArea(String text) {
         Platform.runLater(() -> diagnosticsArea.appendText(text + "\n"));
     }
 

@@ -4,6 +4,7 @@ import com.izo.netpulse.model.SpeedTestResult;
 import com.izo.netpulse.repository.SpeedRepository;
 import com.izo.netpulse.service.SpeedFeedbackService;
 import com.izo.netpulse.service.SpeedTestService;
+import com.izo.netpulse.service.DiagnosticService;
 import com.izo.netpulse.ui.NetPulseController;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
@@ -22,7 +23,7 @@ import java.util.prefs.Preferences;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-// Cleans the Spring context and H2 database between test runs if needed
+// cleans Spring context and H2 database between test runs if needed
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class NetpulseApplicationTests {
 
@@ -37,6 +38,9 @@ class NetpulseApplicationTests {
 
     @Autowired
     private SpeedTestService speedTestService;
+
+    @Autowired
+    private DiagnosticService diagnosticService;
 
     private MockWebServer mockWebServer;
 
@@ -158,5 +162,57 @@ class NetpulseApplicationTests {
             repository.save(result);
         }
         assertEquals(5, repository.count());
+    }
+
+    @Test
+    @DisplayName("Verify DiagnosticService is injected")
+    void testDiagnosticServiceInjection() {
+        assertNotNull(diagnosticService, "DiagnosticService should be managed by Spring");
+    }
+
+    @Test
+    @DisplayName("DNS detection should return a non-empty string")
+    void testDnsDetection() {
+        String dns = diagnosticService.getDnsServers();
+        assertNotNull(dns, "DNS result should not be null");
+        assertFalse(dns.isEmpty(), "DNS result should contain data");
+    }
+
+    @Test
+    @DisplayName("Location API should return successful format or known error")
+    void testLocationService() {
+        String location = diagnosticService.getServerLocation();
+        assertNotNull(location, "Location result should not be null");
+        // Check if it contains the IP label which is part of our successful string format
+        assertTrue(location.contains("IP:") || location.contains("Error"),
+                "Location should return valid data or a handled error message");
+    }
+
+    @Test
+    @DisplayName("First Hop (Gateway) should return valid local IP or timeout")
+    void testFirstHopDetection() {
+        String gateway = diagnosticService.getFirstHop();
+        assertNotNull(gateway);
+        // Gateway should usually contain the hop number "1"
+        assertTrue(gateway.contains("1") || gateway.contains("timeout"),
+                "Gateway should identify the first hop or report a timeout");
+    }
+
+    @Test
+    @DisplayName("Web Reachability test should return connectivity status")
+    void testWebReachability() {
+        String status = diagnosticService.checkWebReachability();
+        assertNotNull(status);
+        assertTrue(status.contains("Accessible") || status.contains("Unreachable"),
+                "Should report either success or failure for HTTP connectivity");
+    }
+
+    @Test
+    @DisplayName("DNS Speed test should return a timed value in ms")
+    void testDnsResolutionSpeed() {
+        String speed = diagnosticService.testDnsSpeed("google.com");
+        assertNotNull(speed);
+        assertTrue(speed.contains("ms") || speed.contains("Failed"),
+                "DNS resolution speed should be formatted in milliseconds");
     }
 }

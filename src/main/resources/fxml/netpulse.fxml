@@ -117,6 +117,7 @@
                           promptText="Click 'Run Diagnostics' to start..."/>
             </VBox>
         </Tab>
+
         <Tab text="SETTINGS">
             <VBox spacing="25" styleClass="settings-container">
                 <padding><Insets top="40" right="40" bottom="40" left="40"/></padding>

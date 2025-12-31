@@ -17,7 +17,6 @@ public class DiagnosticService {
     private final OkHttpClient httpClient = new OkHttpClient();
 
     public String getServerLocation() {
-        // Fetches ISP, City, Country, and ASN info
         Request request = new Request.Builder()
                 .url("http://ip-api.com/line/?fields=status,message,country,city,isp,as,query")
                 .build();
@@ -27,7 +26,6 @@ public class DiagnosticService {
 
             String[] lines = response.body().string().split("\n");
             if (lines[0].equalsIgnoreCase("success")) {
-                // Format: City, Country (ISP) - ASN: ASXXXX - IP: 1.2.3.4
                 return String.format("%s, %s (%s) \nASN: %s \nPublic IP: %s",
                         lines[2], lines[1], lines[3], lines[4], lines[5]);
             } else {
