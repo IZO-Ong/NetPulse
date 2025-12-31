@@ -7,6 +7,7 @@ import com.izo.netpulse.service.SpeedTestService;
 import com.izo.netpulse.service.BackgroundMonitorService;
 import com.izo.netpulse.ui.manager.*;
 import com.izo.netpulse.ui.util.AnimationUtility;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -49,7 +50,8 @@ public class NetPulseController {
     // Managers
     private GaugeManager gaugeManager;
     private TimeRangeManager timeRangeManager;
-    private SettingsManager settingsManager;
+    private ThemeManager themeManager;
+    private BackgroundMonitorManager monitorManager;
     private final WindowManager windowManager = new WindowManager();
 
     // FXML Components
@@ -79,31 +81,31 @@ public class NetPulseController {
     @FXML
     public void initialize() {
         gaugeManager = new GaugeManager(progressArc, needleCircle, speedValueLabel);
-
         timeRangeManager = new TimeRangeManager(timeRangeSelector);
 
-        settingsManager = new SettingsManager(
+        // Initialize new specialized managers
+        themeManager = new ThemeManager(mainContainer, lightModeToggle);
+        monitorManager = new BackgroundMonitorManager(
                 monitorService,
-                mainContainer,
                 backgroundMonitorToggle,
                 monitorIntervalSelector,
-                lightModeToggle,
                 this::refreshHistory
         );
 
-        settingsManager.loadSettings();
+        themeManager.loadSettings();
+        monitorManager.loadSettings();
         refreshHistory();
     }
 
 
     @FXML
     private void handleThemeChange() {
-        settingsManager.handleThemeChange();
+        themeManager.handleThemeChange();
     }
 
     @FXML
     private void handleMonitorSettingsChange() {
-        settingsManager.handleMonitorSettingsChange();
+        monitorManager.handleMonitorSettingsChange();
     }
 
     @FXML
@@ -111,7 +113,7 @@ public class NetPulseController {
         refreshHistory();
     }
 
-    // Speed Test Logic
+    // speed test logic
 
     @FXML
     private void handleActionButtonClick() {
