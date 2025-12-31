@@ -21,7 +21,6 @@
     <HBox alignment="CENTER_RIGHT" styleClass="title-bar"
           onMousePressed="#handleMousePressed"
           onMouseDragged="#handleMouseDragged">
-        <Text text="NetPulse Monitor" styleClass="header-text" />
         <Region HBox.hgrow="ALWAYS" />
         <Button onAction="#handleMinimise" styleClass="window-button">
             <graphic><SVGPath content="M0,5 H10" styleClass="window-icon" /></graphic>

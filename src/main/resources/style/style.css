@@ -54,12 +54,6 @@
     -fx-padding: 0 0 0 15;
 }
 
-.header-text {
-    -fx-fill: -color-text-main;
-    -fx-font-weight: bold;
-    -fx-font-size: 14px;
-}
-
 .window-button, .window-button-close {
     -fx-background-color: transparent;
     -fx-min-width: 45px;
@@ -142,9 +136,12 @@
 
 .status-label {
     -fx-text-fill: -color-text-muted;
-    -fx-font-size: 13px;
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-opacity: 0.8;
+    -fx-wrap-text: true;
+    -fx-text-alignment: CENTER;
+    -fx-line-spacing: 2px;
 }
 
 /* Download styles */

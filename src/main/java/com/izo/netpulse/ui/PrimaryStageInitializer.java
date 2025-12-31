@@ -10,6 +10,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @Component
 public class PrimaryStageInitializer implements ApplicationListener<StageReadyEvent> {
@@ -24,6 +25,12 @@ public class PrimaryStageInitializer implements ApplicationListener<StageReadyEv
     public void onApplicationEvent(StageReadyEvent event) {
         try {
             Stage stage = event.getStage();
+
+            stage.getIcons().add(new javafx.scene.image.Image(
+                    Objects.requireNonNull(getClass().getResourceAsStream("/style/icon.png"))
+            ));
+
+            stage.setTitle("NetPulse");
 
             java.net.URL fxmlUrl = getClass().getResource("/fxml/netpulse.fxml");
 

@@ -1,7 +1,9 @@
 package com.izo.netpulse.ui.manager;
 
+import javafx.animation.FadeTransition;
 import javafx.scene.Parent;
 import javafx.scene.control.CheckBox;
+import javafx.util.Duration;
 import java.util.prefs.Preferences;
 
 public class ThemeManager {
@@ -24,7 +26,20 @@ public class ThemeManager {
     public void handleThemeChange() {
         boolean isLightMode = lightModeToggle.isSelected();
         prefs.putBoolean(PREF_LIGHT_MODE, isLightMode);
-        applyTheme(isLightMode);
+
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(100), rootContainer);
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
+
+        fadeOut.setOnFinished(e -> {
+            applyTheme(isLightMode);
+            FadeTransition fadeIn = new FadeTransition(Duration.millis(150), rootContainer);
+            fadeIn.setFromValue(0.0);
+            fadeIn.setToValue(1.0);
+            fadeIn.play();
+        });
+
+        fadeOut.play();
     }
 
     private void applyTheme(boolean isLightMode) {

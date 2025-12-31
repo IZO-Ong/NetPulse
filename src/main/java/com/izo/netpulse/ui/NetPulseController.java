@@ -147,17 +147,22 @@ public class NetPulseController {
     }
 
     private void startUploadTransition(double avgDl) {
-        statusLabel.setText("Preparing Upload...");
+        statusLabel.setText("Preparing Upload..."); //
+
         Timeline reset = gaugeManager.resetGauge(800);
         reset.setOnFinished(e -> {
             if (!isTestRunning) return;
+
             activeMaxSpeed = MAX_UPLOAD_GAUGE;
             AnimationUtility.switchToMarkers(uploadMarkers, downloadMarkers);
             progressArc.getStyleClass().add("progress-upload");
             needleCircle.getStyleClass().add("progress-upload-needle");
 
-            new Timeline(new KeyFrame(Duration.seconds(1), event -> {
+            // latency check
+            speedService.measureLatencyAverage(() -> {
                 if (!isTestRunning) return;
+
+                // Start upload test
                 statusLabel.setText("Testing Upload... (7s)");
                 speedService.runUploadTest(new SpeedTestService.TestCallback() {
                     @Override
@@ -171,18 +176,25 @@ public class NetPulseController {
                     @Override
                     public void onError(String msg) { handleTestError(msg); }
                 });
-            })).play();
+            });
         });
         reset.play();
     }
 
     private void finalizeFullTest(double dl, double ul) {
         isTestRunning = false;
+
+        double latency = speedService.getCurrentLatency();
+
         speedService.saveResult(dl, ul);
+
         Platform.runLater(() -> {
             actionButton.getStyleClass().remove("button-cancel");
             actionButton.setText("RUN TEST");
-            statusLabel.setText(String.format("DL: %.1f Mbps | UL: %.1f Mbps", dl, ul));
+
+            statusLabel.setText(String.format("DL: %.1f Mbps | UL: %.1f Mbps\nLatency: %.0f ms",
+                    dl, ul, latency));
+
             speedFeedbackLabel.setText(feedbackService.getFeedback(dl));
             gaugeManager.resetGauge(800).play();
             refreshHistory();

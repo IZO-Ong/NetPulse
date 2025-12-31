@@ -7,7 +7,9 @@ import fr.bmartel.speedtest.SpeedTestSocket;
 import fr.bmartel.speedtest.inter.ISpeedTestListener;
 import fr.bmartel.speedtest.model.SpeedTestError;
 import javafx.application.Platform;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +19,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SpeedTestService {
@@ -29,24 +32,28 @@ public class SpeedTestService {
     private volatile boolean isCancelled = false;
     private long lastUpdateTick = 0;
 
+    @Getter
+    private volatile double currentLatency = 0.0;
+
     public interface TestCallback {
         void onInstantUpdate(double mbps);
         void onComplete(double averageMbps);
         void onError(String msg);
     }
 
-    // Download phase with Okhttp
+    // Download phase
     public void runDownloadTest(TestCallback callback) {
         isCancelled = false;
-        String url = "https://speed.cloudflare.com/__down?bytes=150000000";
+        String url = "https://speed.cloudflare.com/__down?bytes=1000000000";
         activeOkCall = okClient.newCall(new Request.Builder().url(url).build());
 
         new Thread(() -> {
             long testStartTime = System.currentTimeMillis();
             List<Double> speedSamples = new ArrayList<>();
+
             try (Response response = activeOkCall.execute()) {
-                if (!response.isSuccessful())
-                    throw new IOException("HTTP " + response.code());
+                if (!response.isSuccessful()) throw new IOException("HTTP " + response.code());
+                assert response.body() != null;
 
                 InputStream is = response.body().byteStream();
                 byte[] buffer = new byte[32768];
@@ -57,7 +64,6 @@ public class SpeedTestService {
                 while (!isCancelled && (read = is.read(buffer)) != -1) {
                     long now = System.currentTimeMillis();
                     bytesInInterval += read;
-
                     if (now - lastTick >= 200) {
                         double seconds = (now - lastTick) / 1000.0;
                         double mbps = (bytesInInterval * 8.0) / (1_000_000.0 * seconds);
@@ -76,7 +82,32 @@ public class SpeedTestService {
         }).start();
     }
 
-    // Upload phase with JSpeedTest
+    // Measures average latency over 10 RTT
+    public void measureLatencyAverage(Runnable onComplete) {
+        new Thread(() -> {
+            List<Double> latencies = new ArrayList<>();
+            Request pingRequest = new Request.Builder()
+                    .url("https://speed.cloudflare.com/cdn-cgi/trace")
+                    .head()
+                    .build();
+
+            for (int i = 0; i < 10; i++) {
+                if (isCancelled) break;
+                long start = System.currentTimeMillis();
+                try (Response response = okClient.newCall(pingRequest).execute()) {
+                    long end = System.currentTimeMillis();
+                    latencies.add((end - start) / 2.0);
+                } catch (IOException e) {
+                    log.warn("Ping attempt {} failed", i + 1);
+                }
+            }
+
+            this.currentLatency = latencies.stream().mapToDouble(d -> d).average().orElse(0.0);
+            Platform.runLater(onComplete);
+        }).start();
+    }
+
+    // Phase 3: Upload
     public void runUploadTest(TestCallback callback) {
         isCancelled = false;
         String url = "https://speed.cloudflare.com/__up";
@@ -95,29 +126,21 @@ public class SpeedTestService {
                     lastUpdateTick = now;
                 }
             }
-
             @Override
             public void onCompletion(SpeedTestReport report) {
                 double avg = uploadSamples.stream().mapToDouble(d -> d).average().orElse(0.0);
                 Platform.runLater(() -> callback.onComplete(avg));
             }
-
             @Override
             public void onError(SpeedTestError error, String msg) {
                 if (!isCancelled) {
-                    if (!uploadSamples.isEmpty()) {
-                        onCompletion(null);
-                    } else {
-                        Platform.runLater(() -> callback.onError("UL Error: " + msg));
-                    }
+                    if (!uploadSamples.isEmpty()) onCompletion(null);
+                    else Platform.runLater(() -> callback.onError("UL Error: " + msg));
                 }
             }
         });
 
-        new Thread(() -> {
-            // 100MB dummy payload
-            speedTestSocket.startFixedUpload(url, 100_000_000, 7000);
-        }).start();
+        new Thread(() -> speedTestSocket.startFixedUpload(url, 300_000_000, 7000)).start();
     }
 
     public void stopTest() {

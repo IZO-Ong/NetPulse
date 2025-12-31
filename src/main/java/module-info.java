@@ -26,6 +26,7 @@ module com.izo.netpulse {
     requires jspeedtest;
     requires org.slf4j;
     requires static lombok;
+    requires annotations;
 
     opens fxml to javafx.fxml;
     opens style to javafx.graphics;
