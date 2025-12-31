@@ -3,11 +3,11 @@
 Welcome to **NetPulse**, a network utility application designed for internet speed testing and network system diagnostics. 
 Built with a Spring Boot backend and a modern JavaFX frontend, NetPulse bridges the gap between simple browser tests and complex network analysis tools.
 
-<p>
+<p align="center">
   <a href="https://github.com/IZO-Ong/netpulse/releases">Download Latest Release</a>
 </p>
 
-<p>
+<p align="center">
   <img alt="Java 21" src="https://img.shields.io/badge/Java-21-orange" />
   <img alt="Spring Boot 3.4.0" src="https://img.shields.io/badge/Spring%20Boot-3.4.0-brightgreen" />
   <img alt="JavaFX 21" src="https://img.shields.io/badge/JavaFX-21-blue" />
@@ -26,7 +26,7 @@ Built with a Spring Boot backend and a modern JavaFX frontend, NetPulse bridges 
 ---
 
 ## Architecture
-```commandline
+```
 JavaFX UI (NetPulseController)
              │          │
              ▼          ▼
