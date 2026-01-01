@@ -15,6 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +43,6 @@ public class SpeedTestService {
         void onError(String msg);
     }
 
-    // Download phase
     public void runDownloadTest(TestCallback callback) {
         isCancelled = false;
         String url = "https://speed.cloudflare.com/__down?bytes=1000000000";
@@ -53,8 +54,6 @@ public class SpeedTestService {
 
             try (Response response = activeOkCall.execute()) {
                 if (!response.isSuccessful()) throw new IOException("HTTP " + response.code());
-                assert response.body() != null;
-
                 InputStream is = response.body().byteStream();
                 byte[] buffer = new byte[32768];
                 long lastTick = System.currentTimeMillis();
@@ -76,38 +75,38 @@ public class SpeedTestService {
                 }
                 double avg = speedSamples.stream().mapToDouble(d -> d).average().orElse(0.0);
                 Platform.runLater(() -> callback.onComplete(avg));
-            } catch (IOException e) {
-                if (!isCancelled) Platform.runLater(() -> callback.onError("DL Error: " + e.getMessage()));
-            }
-        }).start();
-    }
-
-    // Measures average latency over 10 RTT
-    public void measureLatencyAverage(Runnable onComplete) {
-        new Thread(() -> {
-            List<Double> latencies = new ArrayList<>();
-            Request pingRequest = new Request.Builder()
-                    .url("https://speed.cloudflare.com/cdn-cgi/trace")
-                    .head()
-                    .build();
-
-            for (int i = 0; i < 10; i++) {
-                if (isCancelled) break;
-                long start = System.currentTimeMillis();
-                try (Response response = okClient.newCall(pingRequest).execute()) {
-                    long end = System.currentTimeMillis();
-                    latencies.add((end - start) / 2.0);
-                } catch (IOException e) {
-                    log.warn("Ping attempt {} failed", i + 1);
+            } catch (Exception e) {
+                if (!isCancelled) {
+                    Platform.runLater(() -> callback.onError("Download Failed: Check Connection"));
                 }
             }
-
-            this.currentLatency = latencies.stream().mapToDouble(d -> d).average().orElse(0.0);
-            Platform.runLater(onComplete);
         }).start();
     }
 
-    // Phase 3: Upload
+    public void measureLatencyAverage(Runnable onComplete, Runnable onError) {
+        new Thread(() -> {
+            List<Double> latencies = new ArrayList<>();
+            Request pingRequest = new Request.Builder().url("https://1.1.1.1").head().build();
+
+            try {
+                for (int i = 0; i < 5; i++) {
+                    if (isCancelled) return;
+                    long start = System.currentTimeMillis();
+                    try (Response response = okClient.newCall(pingRequest).execute()) {
+                        latencies.add((double)(System.currentTimeMillis() - start));
+                    } catch (IOException ignored) {}
+                }
+
+                if (latencies.isEmpty()) throw new IOException("No pings succeeded");
+
+                this.currentLatency = latencies.stream().mapToDouble(d -> d).average().orElse(0.0);
+                Platform.runLater(onComplete);
+            } catch (Exception e) {
+                Platform.runLater(onError);
+            }
+        }).start();
+    }
+
     public void runUploadTest(TestCallback callback) {
         isCancelled = false;
         String url = "https://speed.cloudflare.com/__up";
@@ -134,13 +133,18 @@ public class SpeedTestService {
             @Override
             public void onError(SpeedTestError error, String msg) {
                 if (!isCancelled) {
-                    if (!uploadSamples.isEmpty()) onCompletion(null);
-                    else Platform.runLater(() -> callback.onError("UL Error: " + msg));
+                    Platform.runLater(() -> callback.onError("Upload Failed: Connection Lost"));
                 }
             }
         });
 
-        new Thread(() -> speedTestSocket.startFixedUpload(url, 300_000_000, 7000)).start();
+        new Thread(() -> {
+            try {
+                speedTestSocket.startFixedUpload(url, 300_000_000, 7000);
+            } catch (Exception e) {
+                Platform.runLater(() -> callback.onError("Upload Socket Error"));
+            }
+        }).start();
     }
 
     public void stopTest() {

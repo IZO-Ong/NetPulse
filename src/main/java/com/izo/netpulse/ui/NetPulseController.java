@@ -38,21 +38,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class NetPulseController {
 
-    // Services
     private final SpeedTestService speedService;
     private final SpeedRepository repository;
     private final SpeedFeedbackService feedbackService;
     private final BackgroundMonitorService monitorService;
     @Autowired private DiagnosticService diagnosticService;
 
-    // Managers
     private GaugeManager gaugeManager;
     private TimeRangeManager timeRangeManager;
     private ThemeManager themeManager;
     private BackgroundMonitorManager monitorManager;
     private final WindowManager windowManager = new WindowManager();
 
-    // FXML Components
     @FXML private VBox mainContainer;
     @FXML private Arc progressArc;
     @FXML private Circle needleCircle;
@@ -72,7 +69,6 @@ public class NetPulseController {
     @FXML private CheckBox backgroundMonitorToggle;
     @FXML private ComboBox<String> monitorIntervalSelector;
 
-    // State
     private boolean isTestRunning = false;
     private double activeMaxSpeed = 250.0;
     private static final double MAX_DOWNLOAD_GAUGE = 250.0;
@@ -82,46 +78,17 @@ public class NetPulseController {
     public void initialize() {
         gaugeManager = new GaugeManager(progressArc, needleCircle, speedValueLabel);
         timeRangeManager = new TimeRangeManager(timeRangeSelector);
-
-        // Initialize new specialized managers
         themeManager = new ThemeManager(mainContainer, lightModeToggle);
-        monitorManager = new BackgroundMonitorManager(
-                monitorService,
-                backgroundMonitorToggle,
-                monitorIntervalSelector,
-                this::refreshHistory
-        );
+        monitorManager = new BackgroundMonitorManager(monitorService, backgroundMonitorToggle, monitorIntervalSelector, this::refreshHistory);
 
         themeManager.loadSettings();
         monitorManager.loadSettings();
         refreshHistory();
     }
 
-
-    @FXML
-    private void handleThemeChange() {
-        themeManager.handleThemeChange();
-    }
-
-    @FXML
-    private void handleMonitorSettingsChange() {
-        monitorManager.handleMonitorSettingsChange();
-    }
-
-    @FXML
-    private void handleTimeRangeChange() {
-        refreshHistory();
-    }
-
-    // speed test logic
-
     @FXML
     private void handleActionButtonClick() {
-        if (isTestRunning) {
-            cancelTest();
-        } else {
-            startTestSequence();
-        }
+        if (isTestRunning) cancelTest(); else startTestSequence();
     }
 
     private void startTestSequence() {
@@ -147,8 +114,7 @@ public class NetPulseController {
     }
 
     private void startUploadTransition(double avgDl) {
-        statusLabel.setText("Preparing Upload..."); //
-
+        statusLabel.setText("Preparing Upload...");
         Timeline reset = gaugeManager.resetGauge(800);
         reset.setOnFinished(e -> {
             if (!isTestRunning) return;
@@ -158,11 +124,8 @@ public class NetPulseController {
             progressArc.getStyleClass().add("progress-upload");
             needleCircle.getStyleClass().add("progress-upload-needle");
 
-            // latency check
             speedService.measureLatencyAverage(() -> {
                 if (!isTestRunning) return;
-
-                // Start upload test
                 statusLabel.setText("Testing Upload... (7s)");
                 speedService.runUploadTest(new SpeedTestService.TestCallback() {
                     @Override
@@ -176,25 +139,20 @@ public class NetPulseController {
                     @Override
                     public void onError(String msg) { handleTestError(msg); }
                 });
-            });
+            }, () -> handleTestError("Latency Check Failed: No Connection."));
         });
         reset.play();
     }
 
     private void finalizeFullTest(double dl, double ul) {
         isTestRunning = false;
-
         double latency = speedService.getCurrentLatency();
-
         speedService.saveResult(dl, ul);
 
         Platform.runLater(() -> {
             actionButton.getStyleClass().remove("button-cancel");
             actionButton.setText("RUN TEST");
-
-            statusLabel.setText(String.format("DL: %.1f Mbps | UL: %.1f Mbps\nLatency: %.0f ms",
-                    dl, ul, latency));
-
+            statusLabel.setText(String.format("DL: %.1f Mbps | UL: %.1f Mbps\nLatency: %.0f ms", dl, ul, latency));
             speedFeedbackLabel.setText(feedbackService.getFeedback(dl));
             gaugeManager.resetGauge(800).play();
             refreshHistory();
@@ -205,16 +163,34 @@ public class NetPulseController {
         isTestRunning = false;
         speedService.stopTest();
         Platform.runLater(() -> {
-            if (activeMaxSpeed == MAX_UPLOAD_GAUGE || uploadMarkers.getOpacity() > 0) {
-                AnimationUtility.switchToMarkers(downloadMarkers, uploadMarkers);
-            }
-            activeMaxSpeed = MAX_DOWNLOAD_GAUGE;
-            actionButton.getStyleClass().remove("button-cancel");
-            actionButton.setText("RUN TEST");
+            resetUIToDefault();
             statusLabel.setText("Test Cancelled");
-            progressArc.getStyleClass().removeAll("progress-upload", "progress-upload-needle");
-            gaugeManager.resetGauge(800).play();
         });
+    }
+
+    private void handleTestError(String error) {
+        isTestRunning = false;
+        speedService.stopTest();
+        Platform.runLater(() -> {
+            resetUIToDefault();
+            statusLabel.setText(error);
+        });
+    }
+
+    private void resetUIToDefault() {
+        // Remove red cancel styling
+        actionButton.getStyleClass().remove("button-cancel");
+        actionButton.setText("RUN TEST");
+
+        // Revert markers if we were in upload phase
+        if (activeMaxSpeed == MAX_UPLOAD_GAUGE || uploadMarkers.getOpacity() > 0) {
+            AnimationUtility.switchToMarkers(downloadMarkers, uploadMarkers);
+        }
+
+        activeMaxSpeed = MAX_DOWNLOAD_GAUGE;
+        progressArc.getStyleClass().removeAll("progress-upload", "progress-upload-needle");
+        needleCircle.getStyleClass().removeAll("progress-upload-needle");
+        gaugeManager.resetGauge(800).play();
     }
 
     private void prepareUIForDownload() {
@@ -229,16 +205,9 @@ public class NetPulseController {
         }
     }
 
-    private void handleTestError(String error) {
-        isTestRunning = false;
-        Platform.runLater(() -> {
-            statusLabel.setText("Error: " + error);
-            actionButton.setText("RUN TEST");
-            gaugeManager.resetGauge(800).play();
-        });
-    }
-
-    // History Logic
+    @FXML private void handleThemeChange() { themeManager.handleThemeChange(); }
+    @FXML private void handleMonitorSettingsChange() { monitorManager.handleMonitorSettingsChange(); }
+    @FXML private void handleTimeRangeChange() { refreshHistory(); }
 
     private void refreshHistory() {
         List<SpeedTestResult> allResults = repository.findAll();
@@ -271,12 +240,9 @@ public class NetPulseController {
             dlSeries.getData().add(new XYChart.Data<>(epoch, result.getDownloadMbps()));
             ulSeries.getData().add(new XYChart.Data<>(epoch, result.getUploadMbps()));
         }
-
         historyLineChart.getData().add(dlSeries);
         historyLineChart.getData().add(ulSeries);
     }
-
-    // Diagnostics
 
     @FXML
     public void runDiagnostics() {
@@ -286,25 +252,14 @@ public class NetPulseController {
 
         Thread diagThread = new Thread(() -> {
             try {
-                // Hardware
                 updateDiagnosticsArea("Local Adapter: " + diagnosticService.getActiveInterface());
-
-                // Public ISP
                 updateDiagnosticsArea("\nLocating Public ISP...");
                 updateDiagnosticsArea(diagnosticService.getServerLocation());
-
-                // DNS and resolution speed
                 updateDiagnosticsArea("\nDNS Configuration: " + diagnosticService.getDnsServers());
                 updateDiagnosticsArea("DNS Resolution Speed (google.com): " + diagnosticService.testDnsSpeed("google.com"));
-
-                // HTTP port check
                 updateDiagnosticsArea("Web Connectivity (Port 80): " + diagnosticService.checkWebReachability());
-
-                // Gateway
                 updateDiagnosticsArea("\nIdentifying First Hop (Gateway)...");
                 updateDiagnosticsArea("Router Response: " + diagnosticService.getFirstHop());
-
-                // Global Pings
                 updateDiagnosticsArea("\nTesting Global Latency...");
                 updateDiagnosticsArea("Google (8.8.8.8): " + diagnosticService.getGlobalPing("8.8.8.8"));
                 updateDiagnosticsArea("Cloudflare (1.1.1.1): " + diagnosticService.getGlobalPing("1.1.1.1"));
@@ -322,12 +277,7 @@ public class NetPulseController {
         diagThread.start();
     }
 
-    private void updateDiagnosticsArea(String text) {
-        Platform.runLater(() -> diagnosticsArea.appendText(text + "\n"));
-    }
-
-
-    // Window Handlers
+    private void updateDiagnosticsArea(String text) { Platform.runLater(() -> diagnosticsArea.appendText(text + "\n")); }
 
     @FXML public void handleMousePressed(MouseEvent event) { windowManager.handlePressed(event); }
     @FXML public void handleMouseDragged(MouseEvent event) { windowManager.handleDragged(event, getStage(event)); }

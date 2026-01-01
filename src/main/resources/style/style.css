@@ -208,26 +208,20 @@
     -fx-text-fill: white;
 }
 
-.pulse-button:hover .text {
-    -fx-fill: white;
-}
-
 .pulse-button.button-cancel {
-    -fx-background-color: -color-error;
+    -fx-background-color: #333333;
     -fx-text-fill: white;
 }
 
-.pulse-button.button-cancel .text {
-    -fx-fill: white;
+.pulse-button.button-cancel:hover {
+    -fx-background-color: -color-error;
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
 }
 
 .light-mode .pulse-button {
     -fx-background-color: #e0e0e0;
     -fx-text-fill: #121212;
-}
-
-.light-mode .pulse-button .text {
-    -fx-fill: #121212;
 }
 
 .light-mode .pulse-button:hover {
@@ -239,9 +233,8 @@
     -fx-fill: white;
 }
 
-
 .light-mode .pulse-button.button-cancel:hover {
-    -fx-background-color: #ff5c5c;
+    -fx-background-color: -color-error;
     -fx-text-fill: white;
 }
 
