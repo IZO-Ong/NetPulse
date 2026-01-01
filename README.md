@@ -93,7 +93,7 @@ Integrates multiple layers of network verification:
 - **Java 21** must be installed on your system.
 - For Windows users, ensure you have permissions to run `ping` and `tracert` in your terminal.
 
-### 1. Download and Run
+### 1. Download and Run (Recommended)
 1. Go to the [Releases](https://github.com/IZO-Ong/netpulse/releases) page.
 2. Download the `netpulse-0.0.1-SNAPSHOT.jar`.
 3. Launch the application:
