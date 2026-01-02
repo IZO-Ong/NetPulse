@@ -11,7 +11,6 @@ Built with a Spring Boot backend and a modern JavaFX frontend, NetPulse bridges 
   <img alt="Java 21" src="https://img.shields.io/badge/Java-21-orange" />
   <img alt="Spring Boot 3.4.0" src="https://img.shields.io/badge/Spring%20Boot-3.4.0-brightgreen" />
   <img alt="JavaFX 21" src="https://img.shields.io/badge/JavaFX-21-blue" />
-  <img alt="License MIT" src="https://img.shields.io/badge/license-MIT-gray" />
 </p>
 
 ---
