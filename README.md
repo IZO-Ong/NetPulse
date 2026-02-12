@@ -1,30 +1,32 @@
 # NetPulse
 
-Welcome to **NetPulse**, a network utility application designed for internet speed testing and network system diagnostics. 
-Built with a Spring Boot backend and a modern JavaFX frontend, NetPulse bridges the gap between simple browser tests and complex network analysis tools.
+NetPulse is a high-performance network utility designed to bridge the gap between simple browser-based tests and complex system diagnostics. Built on a Spring Boot backbone with a reactive JavaFX frontend, it provides pinpoint accuracy for speed testing and deep-tissue network analysis.
 
 <p align="center">
-  <a href="https://github.com/IZO-Ong/netpulse/releases">Download Latest Release</a>
+  <a href="https://github.com/IZO-Ong/netpulse/releases"><b>Download Latest Release</b></a>
 </p>
 
 <p align="center">
-  <img alt="Java 21" src="https://img.shields.io/badge/Java-21-orange" />
-  <img alt="Spring Boot 3.4.0" src="https://img.shields.io/badge/Spring%20Boot-3.4.0-brightgreen" />
-  <img alt="JavaFX 21" src="https://img.shields.io/badge/JavaFX-21-blue" />
+  <img alt="Java 21" src="https://img.shields.io/badge/Java-21-orange?style=flat-square" />
+  <img alt="Spring Boot 3.4.0" src="https://img.shields.io/badge/Spring%20Boot-3.4.0-brightgreen?style=flat-square" />
+  <img alt="JavaFX 21" src="https://img.shields.io/badge/JavaFX-21-blue?style=flat-square" />
 </p>
 
 ---
 
 ## Features
 
-- **Live Speed Testing** — Real-time download and upload measurements with instant feedback.
-- **Deep Diagnostics** — Scans for DNS latency, ISP location, ASN data, and web reachability.
-- **Persistent History** — Built-in local database (H2/JPA) to track your connection performance over time.
-- **System Integration** — Direct interaction with OS networking tools for accurate ping and traceroute data.
+* **Real-Time Throughput** -- Live data streaming via OkHttp for authentic download and upload benchmarking.
+* **Deep Diagnostics** -- Multi-layer scans including DNS latency, ISP mapping and ASN data.
+* **Performance Archiving** -- Integrated H2/JPA database to track connection health over weeks or months.
+* **Hybrid Analysis** -- Combines application-layer HTTP requests with OS-level ICMP tools (Ping/Traceroute).
 
 ---
 
 ## Architecture
+
+NetPulse follows a decoupled architecture ensuring the UI remains responsive even during heavy network saturation.
+
 ```
 JavaFX UI (NetPulseController)
              │          │
@@ -38,53 +40,46 @@ JavaFX UI (NetPulseController)
       H2 Local Database
 ```
 
----
 
-## Features
+## User Guide
 
-### Speed Test
-Utilises **OkHttp** for high-concurrency data streaming to measure true throughput: Calculates average Mbps while providing real-time "instant" updates to the UI thread.
+### 1. Speed Testing
+Navigate to the Dashboard to initiate a test. NetPulse uses a moving average algorithm to bypass initial TCP "cold start" spikes, providing a stabilized Mbps reading.
 
-### Diagnostic Suite
-Integrates multiple layers of network verification:
-- **Application Layer:** HTTP HEAD requests to verify global web reachability.
-- **Transport Layer:** DNS resolution timing and server identification.
-- **Network Layer:** OS-level process execution for Hop 1 (Gateway) response times and global latency.
+* **Latency (Ping):** Measured via high-frequency HEAD requests to global edge nodes.
+* **Visual Gauges:** Adaptive UI that scales based on your current bandwidth.
 
----
+<p align="center">
+  <img src="./assets/screenshot-speedtest.png" width="300" alt="Speed Test UI">
+</p>
 
-## Application Structure
+### 2. Diagnostic Suite
+The Diagnostics tab identifies bottlenecks beyond just raw speed:
 
-### Speed Test Tab
-![Speed Test](./assets/screenshot-speedtest.png)
+* **Network Layer:** Checks Hop 1 (Gateway) response times to see if connectivity issues stem from your router or your ISP.
+* **Identity Mapping:** Automatically resolves your Public IP, ASN, and ISP metadata.
 
-- Visual gauges for download and upload speeds.
-- Real-time latency (ping) tracking.
-- One-click testing with visual progress indicators.
-- Descriptive feedback based on test results.
+<p align="center">
+  <img src="./assets/screenshot-diagnostics.png" width="300" alt="Diagnostics UI">
+</p>
 
-### History Tab
-![History](./assets/screenshot-history.png)
+### 3. Historical Tracking
+All tests are automatically timestamped and stored. Use the History Tab to view performance trends on a dynamic line chart, helping you identify ISP throttling during peak hours.
 
-- View all past speed tests visualised on a line chart.
-- Filter according to a specific time range.
+<p align="center">
+  <img src="./assets/screenshot-history.png" width="300" alt="History UI">
+</p>
 
-### Diagnostics Tab
-![Diagnostics](./assets/screenshot-diagnostics.png)
+### 4. Settings and Customization
+* **Automated Health Checks:** Set NetPulse to run in the background and alert you if connectivity drops.
+* **Theming:** Switch between Onyx Dark and Clean Light modes via the Settings panel.
 
-- Full hardware adapter identification.
-- Public IP, ISP, and ASN mapping.
-- DNS resolution speed testing.
-
-### Settings Tab
-![Settings Page](./assets/screenshot-settings.png)
-
-- Toggle an automated service that periodically checks connection health without user intervention.
-- Seamlessly switch between the default Dark Mode and Light Mode.
-  
-![Light Mode](./assets/screenshot-light-mode.png)
+<p align="center">
+  <img src="./assets/screenshot-light-mode.png" width="300" alt="Light Mode UI">
+</p>
 
 ---
+
 
 ## Getting Started
 
@@ -110,10 +105,10 @@ java -jar target/netpulse-0.0.1-SNAPSHOT.jar
 
 ---
 ## Tech Stack
-- Frontend: JavaFX, FXML, CSS3 
-- Backend: Spring Boot 3.4.0, Spring Data JPA 
+- Frontend: JavaFX, FXML, CSS3
+- Backend: Spring Boot 3.4.0, Spring Data JPA
 - Database: H2 (Embedded)
-- Networking: OkHttp 4.x 
+- Networking: OkHttp 4.x
 - Build Tool: Maven
 ---
 
