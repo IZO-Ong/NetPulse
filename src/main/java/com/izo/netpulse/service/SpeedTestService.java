@@ -56,12 +56,6 @@ public class SpeedTestService {
 
     /**
      * Initiates an asynchronous download test using a bot-friendly mirror.
-     * Uses a 1GB file from ThinkBroadband, which is designed for connection diagnostics.
-     *
-     * @param callback The handler for real-time updates and final results.
-     */
-    /**
-     * Initiates an asynchronous download test using a bot-friendly mirror.
      * Uses a sliding window moving average for smooth UI updates.
      *
      * @param callback The handler for real-time updates and final results.
