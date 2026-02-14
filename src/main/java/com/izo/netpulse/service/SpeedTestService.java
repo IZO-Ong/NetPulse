@@ -2,10 +2,7 @@ package com.izo.netpulse.service;
 
 import com.izo.netpulse.model.SpeedTestResult;
 import com.izo.netpulse.repository.SpeedRepository;
-import fr.bmartel.speedtest.SpeedTestReport;
 import fr.bmartel.speedtest.SpeedTestSocket;
-import fr.bmartel.speedtest.inter.ISpeedTestListener;
-import fr.bmartel.speedtest.model.SpeedTestError;
 import javafx.application.Platform;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -13,18 +10,28 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.springframework.stereotype.Service;
 
+import java.io.ByteArrayInputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Core service for executing network speed tests.
  * Manages asynchronous download and upload tasks, latency measurements,
- * and persistence of test results.
+ * and persistence of test results to the database.
+ * <p>This service utilizes a mix of OkHttp for downloads and the native
+ * {@link java.net.http.HttpClient} for uploads to bypass module visibility
+ * issues common with the okio library in named modules.</p>
  */
 @Slf4j
 @Service
@@ -36,51 +43,68 @@ public class SpeedTestService {
     private SpeedTestSocket speedTestSocket;
     private Call activeOkCall;
 
+    /**
+     * Flag used to immediately terminate active network streams and UI updates.
+     */
     private volatile boolean isCancelled = false;
-    private long lastUpdateTick = 0;
 
     /**
-     * The average latency (ping) calculated during the most recent measurement.
+     * The average latency (ping) in milliseconds calculated during the most recent measurement.
+     * @return The current measured latency.
      */
     @Getter
     private volatile double currentLatency = 0.0;
 
     /**
-     * Callback interface for communicating test progress and results to the UI.
+     * Callback interface for communicating test progress and final results to the UI.
+     * Updates are guaranteed to be wrapped in {@link Platform#runLater(Runnable)}.
      */
     public interface TestCallback {
+        /**
+         * Called periodically to update the real-time speed display (e.g., a gauge needle).
+         * @param mbps The instantaneous speed in Megabits per second.
+         */
         void onInstantUpdate(double mbps);
+
+        /**
+         * Called when the test completes successfully.
+         * @param averageMbps The calculated average speed for the duration of the test.
+         */
         void onComplete(double averageMbps);
+
+        /**
+         * Called if the test fails due to network or logic errors.
+         * @param msg Descriptive error message.
+         */
         void onError(String msg);
     }
 
     /**
-     * Initiates an asynchronous download test using a bot-friendly mirror.
-     * Uses a sliding window moving average for smooth UI updates.
-     *
-     * @param callback The handler for real-time updates and final results.
+     * Initiates an asynchronous download test using OkHttp.
+     * <p>The test requests 1GB of data from Cloudflare but terminates after 7 seconds
+     * or upon cancellation to provide a consistent user experience.</p>
+     * @param callback The handler for real-time updates and results.
      */
     public void runDownloadTest(TestCallback callback) {
         isCancelled = false;
-
-        String url = "https://download.thinkbroadband.com/1GB.zip";
+        String url = "https://speed.cloudflare.com/__down?bytes=1000000000";
 
         activeOkCall = okClient.newCall(new Request.Builder()
                 .url(url)
-                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                .addHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0")
+                .addHeader("Accept", "*/*")
+                .addHeader("Referer", "https://speed.cloudflare.com/")
+                .addHeader("Sec-Fetch-Mode", "cors")
+                .addHeader("Sec-Fetch-Site", "same-origin")
                 .build());
 
         new Thread(() -> {
             long testStartTime = System.currentTimeMillis();
             List<Double> speedSamples = new ArrayList<>();
             Queue<Double> window = new LinkedList<>();
-            int windowSize = 10;
 
             try (Response response = activeOkCall.execute()) {
-                if (!response.isSuccessful()) {
-                    log.error("Download failed with HTTP {}: Check if the mirror is reachable.", response.code());
-                    throw new IOException("HTTP " + response.code());
-                }
+                if (!response.isSuccessful()) throw new IOException("HTTP " + response.code());
 
                 InputStream is = response.body().byteStream();
                 byte[] buffer = new byte[32768];
@@ -98,7 +122,7 @@ public class SpeedTestService {
 
                         speedSamples.add(mbps);
                         window.add(mbps);
-                        if (window.size() > windowSize) window.poll();
+                        if (window.size() > 10) window.poll();
 
                         double movingAvg = window.stream().mapToDouble(d -> d).average().orElse(0.0);
                         Platform.runLater(() -> callback.onInstantUpdate(movingAvg));
@@ -106,7 +130,6 @@ public class SpeedTestService {
                         bytesInInterval = 0;
                         lastTick = now;
                     }
-
                     if (now - testStartTime >= 7000) break;
                 }
 
@@ -114,37 +137,93 @@ public class SpeedTestService {
                     double avg = speedSamples.stream().mapToDouble(d -> d).average().orElse(0.0);
                     Platform.runLater(() -> callback.onComplete(avg));
                 }
-
-            } catch (java.net.SocketTimeoutException e) {
-                log.error("Download timed out.");
-                if (!isCancelled) handleError(callback, "Connection Timeout");
-            } catch (java.net.UnknownHostException e) {
-                log.error("DNS Resolution failed.");
-                if (!isCancelled) handleError(callback, "DNS Error: Host Unreachable");
-            } catch (javax.net.ssl.SSLHandshakeException | javax.net.ssl.SSLPeerUnverifiedException e) {
-                log.error("SSL/Security Error: {}", e.getMessage());
-                if (!isCancelled) handleError(callback, "Security Error (SSL)");
             } catch (Exception e) {
-                if (!isCancelled) {
-                    log.error("Download failed due to unexpected error: {}", e.getMessage(), e);
-                    handleError(callback, "Download Failed: " + e.getClass().getSimpleName());
-                }
+                if (!isCancelled) handleError(callback, "Download Failed: " + e.getMessage());
             }
         }).start();
     }
 
     /**
-     * Helper to ensure the UI is notified on the correct thread.
+     * Initiates an asynchronous upload test using the native {@link HttpClient}.
+     * <p>This implementation avoids third-party okio dependencies to prevent module visibility errors.
+     * It uses a custom {@link FilterInputStream} to track progress and enforce a 7-second cutoff.</p>
+     * * @param callback The handler for real-time updates and results.
      */
-    private void handleError(TestCallback callback, String msg) {
-        Platform.runLater(() -> callback.onError(msg));
+    public void runUploadTest(TestCallback callback) {
+        isCancelled = false;
+        String url = "https://speed.cloudflare.com/__up";
+        byte[] data = new byte[500_000_000]; // 500MB payload
+
+        AtomicLong totalBytesSent = new AtomicLong(0);
+        long testStartTime = System.currentTimeMillis();
+
+        InputStream progressStream = new FilterInputStream(new ByteArrayInputStream(data)) {
+            private long lastTick = System.currentTimeMillis();
+            private long bytesInInterval = 0;
+
+            @Override
+            public int read(byte[] b, int off, int len) throws IOException {
+                long now = System.currentTimeMillis();
+
+                // Terminate if 7 seconds elapsed or if the user cancelled
+                if (isCancelled || (now - testStartTime >= 7000)) {
+                    return -1;
+                }
+
+                int read = super.read(b, off, len);
+                if (read != -1) {
+                    bytesInInterval += read;
+                    totalBytesSent.addAndGet(read);
+
+                    if (now - lastTick >= 150) { // Trigger needle movement every 150ms
+                        double seconds = (now - lastTick) / 1000.0;
+                        double mbps = (bytesInInterval * 8.0) / (1_000_000.0 * seconds);
+                        Platform.runLater(() -> callback.onInstantUpdate(mbps));
+                        bytesInInterval = 0;
+                        lastTick = now;
+                    }
+                }
+                return read;
+            }
+        };
+
+        HttpClient client = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .build();
+
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:147.0) Gecko/20100101 Firefox/147.0")
+                .header("Referer", "https://speed.cloudflare.com/")
+                .header("Origin", "https://speed.cloudflare.com")
+                .header("Sec-Fetch-Mode", "cors")
+                .header("Sec-Fetch-Site", "same-origin")
+                .POST(HttpRequest.BodyPublishers.ofInputStream(() -> progressStream))
+                .build();
+
+        new Thread(() -> {
+            try {
+                // Execute the POST; the progressStream handles the 7s termination
+                client.send(request, HttpResponse.BodyHandlers.discarding());
+
+                if (!isCancelled) {
+                    long endTime = System.currentTimeMillis();
+                    double totalSeconds = (endTime - testStartTime) / 1000.0;
+                    // Mbps = (total_bits) / (1,000,000 * seconds)
+                    double finalMbps = (totalBytesSent.get() * 8.0) / (1_000_000.0 * totalSeconds);
+                    Platform.runLater(() -> callback.onComplete(finalMbps));
+                }
+            } catch (Exception e) {
+                if (!isCancelled) handleError(callback, "Upload Error: " + e.getMessage());
+            }
+        }).start();
     }
 
     /**
-     * Measures average network latency by performing a series of HTTP HEAD requests.
-     *
-     * @param onComplete Runnable executed upon successful measurement.
-     * @param onError    Runnable executed if all ping attempts fail.
+     * Measures average network latency by performing 5 consecutive HTTP HEAD requests.
+     * Result is stored in {@link #currentLatency}.
+     * @param onComplete Runnable to execute on the UI thread upon success.
+     * @param onError    Runnable to execute on the UI thread if pings fail.
      */
     public void measureLatencyAverage(Runnable onComplete, Runnable onError) {
         new Thread(() -> {
@@ -164,100 +243,25 @@ public class SpeedTestService {
                         }
                     } catch (IOException ignored) {}
                 }
-
-                if (latencies.isEmpty()) throw new IOException("No pings succeeded");
-
+                if (latencies.isEmpty()) throw new IOException("Ping failed");
                 this.currentLatency = latencies.stream().mapToDouble(d -> d).average().orElse(0.0);
                 Platform.runLater(onComplete);
             } catch (Exception e) {
-                log.error("Latency check failed", e);
                 Platform.runLater(onError);
             }
         }).start();
     }
 
     /**
-     * Initiates an asynchronous upload test with a watchdog timer.
-     * Includes a manual warm-up period to ignore initial OS buffering spikes.
-     *
-     * @param callback The handler for real-time updates and final results.
+     * Helper method to dispatch error messages to the UI thread.
      */
-    public void runUploadTest(TestCallback callback) {
-        isCancelled = false;
-        String url = "https://speedtest.newark.linode.com/empty.php";
-
-        List<Double> uploadSamples = new ArrayList<>();
-        Queue<Double> window = new LinkedList<>();
-        int windowSize = 10;
-
-        // Track when the test actually starts
-        final long testStartTime = System.currentTimeMillis();
-        lastUpdateTick = testStartTime;
-
-        speedTestSocket = new SpeedTestSocket();
-        speedTestSocket.setUploadSetupTime(1000);
-
-        speedTestSocket.addSpeedTestListener(new ISpeedTestListener() {
-            @Override
-            public void onProgress(float percent, SpeedTestReport report) {
-                long now = System.currentTimeMillis();
-
-                if (!isCancelled && (now - lastUpdateTick >= 200) && (now - testStartTime > 1500)) {
-                    double mbps = report.getTransferRateBit().doubleValue() / 1_000_000.0;
-
-                    uploadSamples.add(mbps);
-                    window.add(mbps);
-                    if (window.size() > windowSize) window.poll();
-
-                    double movingAvg = window.stream().mapToDouble(d -> d).average().orElse(0.0);
-
-                    Platform.runLater(() -> callback.onInstantUpdate(movingAvg));
-                    lastUpdateTick = now;
-                }
-            }
-
-            @Override
-            public void onCompletion(SpeedTestReport report) {
-                if (!isCancelled) {
-                    double avg = uploadSamples.stream().mapToDouble(d -> d).average().orElse(0.0);
-                    Platform.runLater(() -> callback.onComplete(avg));
-                    isCancelled = true;
-                }
-            }
-
-            @Override
-            public void onError(SpeedTestError error, String msg) {
-                if (!isCancelled) {
-                    log.error("Upload failed: Type={} | Msg={}", error, msg);
-                    Platform.runLater(() -> callback.onError("Upload Failed: " + error.name()));
-                    isCancelled = true;
-                }
-            }
-        });
-
-        new Thread(() -> {
-            try {
-                speedTestSocket.startFixedUpload(url, 50_000_000, 7000);
-
-                // Watchdog grace period
-                Thread.sleep(8500);
-
-                if (!isCancelled) {
-                    log.warn("Upload Watchdog: Test hung. Forcing completion.");
-                    stopTest();
-                    double avg = uploadSamples.stream().mapToDouble(d -> d).average().orElse(0.0);
-                    Platform.runLater(() -> callback.onComplete(avg));
-                    isCancelled = true;
-                }
-            } catch (Exception e) {
-                log.error("Upload thread error", e);
-            }
-        }).start();
+    private void handleError(TestCallback callback, String msg) {
+        Platform.runLater(() -> callback.onError(msg));
     }
 
     /**
      * Forces all active network calls and sockets to stop immediately.
-     * Sets the cancellation flag to prevent further UI updates.
+     * Resets internal flags to prevent further data sampling or UI updates.
      */
     public void stopTest() {
         isCancelled = true;
@@ -266,10 +270,9 @@ public class SpeedTestService {
     }
 
     /**
-     * Persists the results of a completed speed test to the database.
-     *
-     * @param dl Final average download speed in Mbps.
-     * @param ul Final average upload speed in Mbps.
+     * Persists the results of a completed speed test session to the local database.
+     * @param dl The final average download speed in Megabits per second.
+     * @param ul The final average upload speed in Megabits per second.
      */
     public void saveResult(double dl, double ul) {
         SpeedTestResult result = new SpeedTestResult();

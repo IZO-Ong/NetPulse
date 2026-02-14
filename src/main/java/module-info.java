@@ -1,4 +1,7 @@
 module com.izo.netpulse {
+    //Java
+    requires java.net.http;
+
     // JavaFX
     requires javafx.controls;
     requires javafx.fxml;

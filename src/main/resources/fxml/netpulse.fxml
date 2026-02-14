@@ -5,7 +5,6 @@
 <?import javafx.scene.chart.*?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.shape.Arc?>
-<?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.Group?>
 <?import javafx.geometry.Insets?>
 
