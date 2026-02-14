@@ -11,7 +11,6 @@ import com.izo.netpulse.ui.util.AnimationUtility;
 
 import javafx.animation.Timeline;
 import javafx.application.Platform;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Group;
 import javafx.scene.Node;
@@ -19,7 +18,6 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.Circle;
@@ -54,7 +52,6 @@ public class NetPulseController {
     private TimeRangeManager timeRangeManager;
     private ThemeManager themeManager;
     private BackgroundMonitorManager monitorManager;
-    private final WindowManager windowManager = new WindowManager();
 
     // FXML UI Components
     @FXML private VBox mainContainer;
@@ -336,12 +333,6 @@ public class NetPulseController {
 
     /** Updates the diagnostic text area safely from a background thread. */
     private void updateDiagnosticsArea(String text) { Platform.runLater(() -> diagnosticsArea.appendText(text + "\n")); }
-
-    // Window Management Events
-    @FXML public void handleMousePressed(MouseEvent event) { windowManager.handlePressed(event); }
-    @FXML public void handleMouseDragged(MouseEvent event) { windowManager.handleDragged(event, getStage(event)); }
-    @FXML public void handleMinimise(ActionEvent event) { getStage(event).setIconified(true); }
-    @FXML public void handleMaximize(ActionEvent event) { windowManager.toggleMaximize(getStage(event), maximizeIcon); }
 
     /** Closes the application and shuts down the JVM. */
     @FXML public void handleClose() { Platform.exit(); System.exit(0); }

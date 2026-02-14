@@ -37,7 +37,7 @@ public class JavaFxApp extends Application {
      */
     @Override
     public void start(Stage primaryStage) {
-        primaryStage.initStyle(StageStyle.TRANSPARENT);
+        primaryStage.initStyle(StageStyle.DECORATED);
         context.publishEvent(new StageReadyEvent(primaryStage));
     }
 

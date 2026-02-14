@@ -17,21 +17,6 @@
       maxWidth="-Infinity" maxHeight="-Infinity"
       minWidth="-Infinity" minHeight="-Infinity">
 
-    <HBox alignment="CENTER_RIGHT" styleClass="title-bar"
-          onMousePressed="#handleMousePressed"
-          onMouseDragged="#handleMouseDragged">
-        <Region HBox.hgrow="ALWAYS" />
-        <Button onAction="#handleMinimise" styleClass="window-button">
-            <graphic><SVGPath content="M0,5 H10" styleClass="window-icon" /></graphic>
-        </Button>
-        <Button onAction="#handleMaximize" styleClass="window-button">
-            <graphic><SVGPath fx:id="maximizeIcon" content="M2,2 H8 V8 H2 Z" styleClass="window-icon" /></graphic>
-        </Button>
-        <Button onAction="#handleClose" styleClass="window-button-close">
-            <graphic><SVGPath content="M1,1 L9,9 M9,1 L1,9" styleClass="window-icon" /></graphic>
-        </Button>
-    </HBox>
-
     <TabPane tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <Tab text="SPEED TEST">
             <VBox styleClass="speed-test-container" spacing="10" VBox.vgrow="ALWAYS" alignment="CENTER">
